@@ -98,8 +98,8 @@ work-buddy-version/
 ├── v4.html                 # v4 历史快照（当前最新，Phase 4 部分子项）
 ├── CHANGELOG.md            # 更新日志
 ├── README.md               # 本文件
-└── v3项目总结.md            # v3 阶段项目总结
-└── v4项目总结.md            # v4 阶段项目总结
+└── v3更新日志.md            # v3 阶段项目总结
+└── v4更新日志.md            # v4 阶段项目总结
 ```
 
 ## 开发约束
