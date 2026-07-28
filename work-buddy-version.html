@@ -177,6 +177,9 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
 .field input,.field select,.field textarea{width:100%;border:2px solid var(--ink);padding:8px 10px;font-size:13px;font-family:inherit;border-radius:0;background:#fff}
 .field input:focus,.field select:focus,.field textarea:focus{outline:0;box-shadow:4px 4px 0 var(--accent)}
 .field .req{color:var(--accent)}
+.rel-cascade{display:flex;gap:8px;flex-wrap:wrap}
+.rel-cascade select{flex:1 1 160px;min-width:0}
+.rel-note{font-size:11px;font-weight:700;color:var(--accent);margin-top:6px}
 .modal-bg{position:fixed;inset:0;background:rgba(10,10,10,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow:auto}
 .modal-bg.show{display:flex;animation:fadeIn .2s ease}
 .modal{background:#fff;border:2px solid var(--ink);padding:24px;width:600px;max-width:100%;position:relative;animation:modalIn .28s ease;box-shadow:8px 8px 0 var(--accent)}
@@ -188,11 +191,22 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
 /* batch modal — wider, yellow uncertainty cells */
 .modal.wide{width:880px;max-width:96vw}
 .cell-warn{background:#fff3bf!important;box-shadow:inset 0 0 0 1.5px #e0a800}
-.batch-summary{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--sub);margin:16px 0 8px;text-transform:uppercase}
+.batch-summary{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--sub);margin:16px 0 10px;text-transform:uppercase}
 .batch-summary b{color:var(--accent)}
-#batchTable td,#batchTable th{padding:8px 10px;vertical-align:middle}
-#batchTable select,#batchTable input{border:1.5px solid var(--ink);padding:4px 6px;font-size:12px;font-family:inherit;background:#fff;border-radius:0;width:100%}
-#batchTable .bcontent{width:100%;min-width:160px}
+.batch-cards{display:flex;flex-direction:column;gap:14px;max-height:54vh;overflow:auto;padding:2px}
+.batch-card{border:2px solid var(--ink);background:#fff;padding:12px 14px;box-shadow:3px 3px 0 rgba(10,10,10,.10)}
+.batch-card.batch-child{border-left:6px solid var(--accent);background:#faf6ee}
+.batch-card .bc-line{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
+.batch-card .bc-content{margin-top:11px;padding-top:11px;border-top:1px dashed #d8cfbf}
+.batch-card .bc-field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.batch-card .bc-field label{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--sub);text-transform:uppercase}
+.batch-card .bc-name{flex:3 1 320px}
+.batch-card .bc-req{flex:1 1 170px}
+.batch-card .bc-rel{flex:1 1 150px}
+.batch-card .bc-idx{font-size:15px;font-weight:900;color:var(--accent);align-self:center;min-width:22px}
+.batch-card select,.batch-card input{border:1.5px solid var(--ink);padding:6px 8px;font-size:13px;font-family:inherit;background:#fff;border-radius:0;width:100%}
+.batch-card .bc-field.warn select,.batch-card .bc-field.warn input{background:#fff3cd;border-color:#b8860b}
+.batch-card.batch-child .bc-name label::after{content:' ↳ 子任务';color:var(--accent)}
 
 /* route transition */
 #main > *{animation:viewEnter .34s ease-out both}
@@ -221,6 +235,41 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
 .pc-meta{font-size:11px;letter-spacing:1px;font-weight:800;color:var(--sub);text-transform:uppercase}
 .pc-go{margin-top:12px;font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;color:var(--ink)}
 
+/* 项目右键菜单 */
+.ctx-menu{position:fixed;z-index:80;background:#fff;border:2px solid var(--ink);min-width:172px;box-shadow:5px 5px 0 var(--accent);padding:6px;display:none}
+.ctx-menu.show{display:block;animation:modalIn .12s ease}
+.ctx-menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);letter-spacing:.5px;border-radius:2px;font-family:inherit}
+.ctx-menu button:hover{background:var(--accent);color:#fff}
+.ctx-menu button.danger{color:#b00020}
+.ctx-menu button.danger:hover{background:#b00020;color:#fff}
+/* 导航右侧「＋」新建项目按钮 */
+.nav-add{margin-left:auto;font-size:18px;line-height:1;font-weight:900;color:var(--accent);cursor:pointer;padding:0 4px 0 12px;user-select:none}
+.nav-add:hover{color:var(--ink)}
+/* 子导航底部「＋ 新建项目」 */
+.subnav li.proj-add{color:var(--accent);font-weight:700}
+.subnav li.proj-add:hover{color:#fff;background:var(--accent)}
+
+/* 母/子任务树形 */
+.board tr.child-row{background:#faf6ee}
+.board tr.child-row .tw-indent{padding-left:calc(6px + var(--d,0)*22px)}
+.board td.name-cell[data-toggle]{cursor:pointer}
+.board .tw-indent{display:inline-flex;align-items:center}
+.board .tw-toggle{font-weight:900;margin-right:5px;color:var(--accent);user-select:none}
+.board .tw-toggle.dim{color:#c9bda8;margin-right:7px}
+.board .tw-badge{font-size:10px;background:var(--accent);color:#fff;border-radius:9px;padding:1px 7px;margin-left:7px;font-weight:800;letter-spacing:.5px;white-space:nowrap}
+.board .tw-child{display:inline-block;font-size:11px;font-weight:800;color:var(--accent);background:#f0e6d6;padding:1px 7px;border-radius:9px;margin-right:6px}
+.board td.act-cell .btn{margin:0}
+/* 批量录入：选了母任务后缩进显示子任务 */
+/* 甘特图：母任务汇总带 + 子任务缩进 */
+.gantt-bar.summary{background:var(--accent);opacity:.5;border:1px dashed #fff;cursor:pointer;display:flex;align-items:center;gap:6px}
+.gantt-bar.summary .name{font-weight:900}
+.gantt-row.child .gantt-bar{margin-left:26px;width:auto}
+.gantt-row.child .gantt-bar .proj{opacity:.7}
+/* 删除母任务弹窗：子任务勾选列表 */
+.chk-list{display:flex;flex-direction:column;gap:9px;margin:14px 0;max-height:42vh;overflow:auto}
+.chk{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:600;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -229,7 +278,7 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
     <div class="brand"><div class="mark">校招 · WORKBENCH</div><div class="sub">CAMPUS RECRUIT · FULL CYCLE</div></div>
     <nav class="nav" id="nav">
       <a data-route="overview" class="active"><span class="num">01</span>概况</a>
-      <a data-route="roadmap" id="navRoadmap"><span class="num">02</span>Roadmap</a>
+      <a data-route="roadmap" id="navRoadmap"><span class="num">02</span>Roadmap<span class="nav-add" id="navAddProj" title="新建项目">＋</span></a>
       <ul class="subnav hidden" id="projectList"></ul>
       <a data-route="files"><span class="num">03</span>文件库</a>
       <a data-route="notes"><span class="num">04</span>碎碎念</a>
@@ -239,6 +288,7 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
   <main id="main"></main>
 </div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
+<div class="ctx-menu" id="ctxMenu"></div>
 
 <script>
 /* ============ 常量 ============ */
@@ -281,16 +331,16 @@ function normalize(){
   if(!state.fileFilters) state.fileFilters = {project:'all',type:'all',asc:true};
   if(!state.filters) state.filters = {type:'all',dueBefore:'',status:'all',startFrom:''};
   if(!state.projectOrder) state.projectOrder = [];
+  if(!Array.isArray(state.expandedParents)) state.expandedParents=[];
   if(!state.ganttAnchor) state.ganttAnchor=todayStr();
   state.files.forEach(f=>{ if(f.url===undefined) f.url=''; });
   state.tasks.forEach(t=>{
     if(!Array.isArray(t.linkedFiles)) t.linkedFiles=[];
+    if(t.related===undefined) t.related='';
     if(t.version===undefined) t.version='';
     if(t.feedback===undefined) t.feedback='';
     /* 字段演进：任务内容→任务名称(name) + 任务要求(requirement)；周期(cycle)不再展示 */
-    if(t.name===undefined) t.name = (t.name!==undefined ? t.name : '');
     if(t.name===undefined) t.name='';
-    if(t.name!==undefined) delete t.name;
     if(t.requirement===undefined) t.requirement='';
     if(t.project) t.project=normalizeProject(t.project);
     if(t.type) t.type=normalizeType(t.type);
@@ -335,6 +385,7 @@ function seed(){
   return {tasks,logs,notes,reports:[],files,projectOrder:['招商局','特发集团'],
     filters:{type:'all',dueBefore:'',status:'all',startFrom:''},
     fileFilters:{project:'all',type:'all',asc:true},
+    expandedParents:[],
     roadmapSort:'asc', roadmapView:'board', ganttAnchor:todayStr(), currentProject:'all'};
 }
 function l(ts,action,taskId,text){ return {id:uid(),ts,action,taskId,text}; }
@@ -471,8 +522,9 @@ function renderProjectNav(){
     html += `<li data-p="${esc(p)}" class="${state.currentProject===p?'active':''}" draggable="true">
       <span class="grip">⠿</span>${esc(p)}</li>`;
   });
+  html += `<li class="proj-add" data-add="1"><span class="grip" style="visibility:hidden">⠿</span>＋ 新建项目</li>`;
   ul.innerHTML = html;
-  ul.querySelectorAll('li').forEach(li=>{
+  ul.querySelectorAll('li[data-p]').forEach(li=>{
     li.addEventListener('click',e=>{ if(e.target.classList.contains('grip'))return; go('roadmap', li.dataset.p); });
     li.addEventListener('dragstart',e=>{ li.classList.add('dragging'); e.dataTransfer.setData('text', li.dataset.p); });
     li.addEventListener('dragover',e=>e.preventDefault());
@@ -484,7 +536,97 @@ function renderProjectNav(){
         arr.splice(i,1); arr.splice(j,0,from); save(); renderProjectNav();
       }
     });
+    li.addEventListener('contextmenu',e=>{ e.preventDefault(); showProjectMenu(e.clientX, e.clientY, li.dataset.p); });
   });
+  ul.querySelector('li[data-add]').addEventListener('click',e=>{ e.stopPropagation(); openAddProject(); });
+}
+
+/* ============ 项目新增 / 重命名 / 删除 ============ */
+function showProjectMenu(x,y,name){
+  const menu = $('#ctxMenu');
+  menu.dataset.p = name;
+  menu.innerHTML = `<button data-act="rename">✏️ 重命名</button><button data-act="delete" class="danger">🗑 删除项目</button>`;
+  menu.style.left = Math.min(x, window.innerWidth-190)+'px';
+  menu.style.top  = Math.min(y, window.innerHeight-100)+'px';
+  menu.classList.add('show');
+  menu.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const act=b.dataset.act; hideProjectMenu();
+    if(act==='rename') openRenameProject(name);
+    else if(act==='delete') deleteProject(name);
+  }));
+}
+function hideProjectMenu(){ const m=$('#ctxMenu'); if(m) m.classList.remove('show'); }
+
+function openAddProject(){
+  const html = `<h3>新建项目</h3>
+    <div class="field"><label>项目名称 *</label><input id="np_name" placeholder="如：腾讯 校招 / 字节实习" autocomplete="off"></div>
+    <div class="hint">新建后自动进入该项目看板。同名项目不会被重复创建。</div>
+    <div style="text-align:right;margin-top:6px">
+      <button class="btn ghost sm" id="npCancel">取消</button>
+      <button class="btn ok sm" id="npSave">创建</button>
+    </div>`;
+  openModal(html);
+  const inp=$('#np_name'); inp.focus();
+  const submit=()=>{ const v=inp.value; closeModal(); addProject(v); };
+  $('#npCancel').addEventListener('click',closeModal);
+  $('#npSave').addEventListener('click',submit);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+}
+function addProject(raw){
+  const name=(raw||'').trim();
+  if(!name) return;
+  if(state.projectOrder.includes(name)){ alert('项目「'+name+'」已存在'); return; }
+  state.projectOrder.push(name);
+  addLog('add', null, `新建项目《${name}》`);
+  save(); render(); go('roadmap', name);
+}
+function openRenameProject(old){
+  const html = `<h3>重命名项目</h3>
+    <div class="field"><label>项目名称 *</label><input id="rp_name" value="${esc(old)}" autocomplete="off"></div>
+    <div class="hint">该项目下所有任务与文件会自动跟随改名；若新名称已存在则并入该项目。</div>
+    <div style="text-align:right;margin-top:6px">
+      <button class="btn ghost sm" id="rpCancel">取消</button>
+      <button class="btn ok sm" id="rpSave">保存</button>
+    </div>`;
+  openModal(html);
+  const inp=$('#rp_name'); inp.focus(); inp.select();
+  const submit=()=>{ const v=inp.value; closeModal(); renameProject(old, v); };
+  $('#rpCancel').addEventListener('click',closeModal);
+  $('#rpSave').addEventListener('click',submit);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+}
+function renameProject(old, raw){
+  const name=(raw||'').trim();
+  if(!name || name===old) return;
+  if(state.projectOrder.includes(name)){
+    if(!confirm(`项目「${name}」已存在，将把「${old}」的任务与文件并入「${name}」，并删除「${old}」？`)) return;
+    state.tasks.forEach(t=>{ if(t.project===old) t.project=name; });
+    state.files.forEach(f=>{ if(f.project===old) f.project=name; });
+    state.projectOrder = state.projectOrder.filter(p=>p!==old);
+    if(state.currentProject===old) state.currentProject=name;
+    addLog('update', null, `项目《${old}》并入《${name}》`);
+  } else {
+    const i = state.projectOrder.indexOf(old);
+    if(i>=0) state.projectOrder[i]=name;
+    state.tasks.forEach(t=>{ if(t.project===old) t.project=name; });
+    state.files.forEach(f=>{ if(f.project===old) f.project=name; });
+    if(state.currentProject===old) state.currentProject=name;
+    addLog('update', null, `项目《${old}》重命名为《${name}》`);
+  }
+  save(); render();
+}
+function deleteProject(name){
+  const n = state.tasks.filter(t=>t.project===name).length;
+  const m = state.files.filter(f=>f.project===name).length;
+  let msg = `确认删除项目「${name}」？`;
+  if(n||m) msg += `\n该项目下还有 ${n} 条任务、${m} 个文件，将一并删除且不可恢复。`;
+  if(!confirm(msg)) return;
+  state.projectOrder = state.projectOrder.filter(p=>p!==name);
+  if(n) state.tasks = state.tasks.filter(t=>t.project!==name);
+  if(m) state.files = state.files.filter(f=>f.project!==name);
+  if(state.currentProject===name) state.currentProject='all';
+  addLog('delete', null, `删除项目《${name}》${n||m?`（含 ${n} 任务 / ${m} 文件）`:''}`);
+  save(); render();
 }
 
 /* ============ 概况页 ============ */
@@ -591,53 +733,91 @@ function nextVersionFor(content){
   const vers = state.tasks.filter(t=> baseNameOf(t.name)===base).map(t=> verNumOf(t.version));
   return 'v'+(vers.length? (Math.max(...vers)+1) : 1);
 }
-function openQuickPreview(text){
-  const p = parseQuick(text);
+function openQuickPreview(text, preset){
+  const p = parseQuick(text||'');
   const base = baseNameOf(p.name) || p.name;
   const ver = nextVersionFor(base);
   const matches = state.tasks.filter(t=> baseNameOf(t.name)===base);
   const matchHint = matches.length
     ? `已匹配 ${matches.length} 个相关任务：${matches.map(m=>`${esc(m.name)}${m.version?`(${m.version})`:'(主)'}`).join('、')} → 本次自动记为 <b>${esc(ver)}</b>`
     : `首次录入，将记为 <b>v1</b>（主版本，列表不显示版本标签）`;
-  const projOpts = projects().map(pr=>`<option ${pr===p.project?'selected':''}>${esc(pr)}</option>`).join('');
+  const presetRel = (preset&&preset.related)||'';
+  const presetProj = (preset&&preset.project)||'';
+  const presetTask = presetRel ? state.tasks.find(x=>x.id===presetRel) : null;
+  let relL1Sel = presetRel ? topAncestorId(presetRel) : '';
+  let relL2Sel = (presetTask && presetTask.related && presetTask.related!==relL1Sel) ? presetTask.related : '';
+  const projOpts = projects().map(pr=>`<option ${pr===presetProj?'selected':''}>${esc(pr)}</option>`).join('');
   const typeOpts = TYPES.map(tp=>`<option ${tp===p.type?'selected':''}>${esc(tp)}</option>`).join('');
-  const relOpts = state.tasks.map(x=>`<option value="${x.id}">${esc(x.name)}${x.version?`(${x.version})`:''}</option>`).join('');
   const html = `<h3>识别结果 · 请确认</h3>
     <div class="hint" style="margin-bottom:10px">${matchHint}</div>
     <div class="field"><label>任务名称 <span class="req">*</span></label><input id="f_name" value="${esc(base)}"></div>
     <div class="field"><label>任务要求</label><input id="f_req" value="${esc(p.requirement)}" placeholder="具体要求、备注等"></div>
     <div class="field"><label>任务类型 <span class="req">*</span></label><select id="f_type">${typeOpts}</select></div>
-    <div class="field"><label>项目 <span class="req">*</span></label><select id="f_project"><option value="">—</option>${projOpts}</select></div>
+    <div class="field"><label>项目 <span class="req">*</span></label><select id="f_project"><option value="">— 请选择项目</option>${projOpts}</select></div>
     <div class="field"><label>起始时间 <span class="req">*</span></label><input id="f_start" type="date" value="${esc(p.start)}"></div>
     <div class="field"><label>预计交付日期 <span class="req">*</span></label><input id="f_due" type="date" value="${esc(p.due)}"></div>
-    <div class="field"><label>主任务</label><select id="f_rel"><option value="">—（本身是主任务）</option>${relOpts}</select></div>
+    <div class="field"><label>母任务 / 归属层级（仅同项目；可选二级）</label>
+      <div class="rel-cascade">
+        <select id="relL1"></select><span id="relL2Wrap" style="display:none"><select id="relL2"></select></span>
+      </div>
+      <div class="rel-note" id="relNote"></div>
+    </div>
     <div class="field"><label>反馈意见</label><input id="f_fb" placeholder="子任务相对主任务的反馈 / 修订意见"></div>
     <div class="field"><label>难点和动作</label><input id="f_diff" placeholder="卡点 + 应对动作"></div>
     <div class="field"><label>负责人</label><input id="f_owner" value="${OWNER_DEFAULT}"></div>
-    <div class="hint">版本号由系统按同名任务自动递增（v1 主版本 → v2 → v3 …；v1 在任务列表不显示版本标签）；主任务归属列不在任务列表中显示。</div>
+    <div class="hint">版本号按同名任务自动递增；子任务会自动跟随母任务的项目；看板中母任务可点击展开/收起子任务。</div>
     <div style="text-align:right;margin-top:10px">
       <button class="btn ghost sm" id="mCancel">取消</button>
       <button class="btn ok sm" id="mSave">确认填入</button>
     </div>`;
   openModal(html);
+  /* 模态框内元素读取一律限定在 #modalBg 作用域，避免与看板筛选栏同名的 #f_type/#f_start/#f_due 冲突（否则会误读筛选栏、导致子任务保存失败） */
+  const $m = sel => $('#modalBg '+sel);
   $('#mCancel').addEventListener('click', closeModal);
-  $('#mSave').addEventListener('click', ()=>{
-    const name=$('#f_name').value.trim();
-    const requirement=$('#f_req').value.trim();
-    const project=$('#f_project').value;
-    const type=$('#f_type').value;
-    const start=$('#f_start').value;
-    const due=$('#f_due').value;
-    if(!name||!project||!type||!start||!due){ alert('必填：任务名称、项目、任务类型、起始时间、预计交付日期'); return; }
+  /* —— 母任务级联：先选项目 → 出现一级母任务 → 选一级后出现二级 —— */
+  let effRel = presetRel;   // 默认=预设（来自 +子）；用户改选后以此为准
+  const projSel = $m('#f_project');
+  function rebL1(){
+    const proj=projSel.value;
+    $('#relL1').innerHTML = relL1OptionsHTML(proj, relL1Sel);
+    rebL2();
+  }
+  function rebL2(){
+    const l1=$('#relL1').value, l2w=$('#relL2Wrap'), l2=$('#relL2');
+    const opts=relL2OptionsHTML(l1, relL2Sel);
+    if(opts){ l2.innerHTML=opts; l2w.style.display='inline-block'; } else { l2w.style.display='none'; }
+    updateNote();
+  }
+  function updateNote(){
+    const l1=$('#relL1').value, l2=$('#relL2').value;
+    effRel = l2 || l1 || presetRel;
+    const par = effRel ? state.tasks.find(x=>x.id===effRel) : null;
+    $('#relNote').textContent = par ? ('将作为《'+par.name+'》的子任务（自动归入 '+par.project+'）') : '新建为顶级任务';
+  }
+  projSel.addEventListener('change', ()=>{ relL1Sel=''; relL2Sel=''; rebL1(); });   // 改项目清空已选层级
+  $('#relL1').addEventListener('change', ()=>{ relL1Sel=''; relL2Sel=''; rebL2(); });
+  $('#relL2').addEventListener('change', updateNote);
+  if(presetProj){ rebL1(); } else { $('#relL1').innerHTML='<option value="">— 请先选择项目</option>'; $('#relL2Wrap').style.display='none'; }
+  updateNote();
+  $m('#mSave').addEventListener('click', ()=>{
+    const name=$m('#f_name').value.trim();
+    const requirement=$m('#f_req').value.trim();
+    const type=$m('#f_type').value;
+    const start=$m('#f_start').value;
+    const due=$m('#f_due').value;
+    if(!name||!type||!start||!due){ alert('必填：任务名称、任务类型、起始时间、预计交付日期'); return; }
+    const relId=effRel;
+    const par=relId?state.tasks.find(x=>x.id===relId):null;
+    let project=projSel.value;
+    if(par && par.project) project=par.project;   // 子任务跟随母任务项目
+    if(!project){ alert('请选择项目（或先为母任务指定项目）'); return; }
     if(!projectExists(project)){ state.projectOrder.push(project); }
     const b = baseNameOf(name);
     const v = nextVersionFor(b);
-    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:$('#f_rel').value,version:v,feedback:$('#f_fb').value,difficulty:$('#f_diff').value,owner:$('#f_owner').value,status:'未完成',createdAt:nowISO(),updatedAt:nowISO()};
+    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId,version:v,feedback:$m('#f_fb').value,difficulty:$m('#f_diff').value,owner:$m('#f_owner').value,status:'未完成',createdAt:nowISO(),updatedAt:nowISO()};
     state.tasks.push(task);
-    addLog('add', task.id, `新增任务《${b}》${v?('('+v+')'):'(主任务)'}`);
-    save(); closeModal();
-    alert('已填入任务，工作日志已记录。');
-    go('overview');
+    addLog('add', task.id, `新增任务《${b}》${relId?'(子任务)':'(主任务)'}`);
+    save(); closeModal(); render();
   });
 }
 
@@ -765,30 +945,50 @@ function renderBatchPreview(text){
   const projOpts = p => allProjects.map(pr=>`<option ${pr===p?'selected':''}>${esc(pr)}</option>`).join('') + (p==='待定'?`<option selected>待定</option>`:`<option>待定</option>`);
   const typeOpts = t => TYPES.map(tp=>`<option ${tp===t?'selected':''}>${esc(tp)}</option>`).join('');
   const statusOpts = s => STATUSES.map(st=>`<option ${st===s?'selected':''}>${esc(st)}</option>`).join('');
-  const rows = parsed.map((x,i)=>`
-    <tr data-i="${i}">
-      <td>${i+1}</td>
-      <td class="${x.projUncertain?'cell-warn':''}"><select class="bproj">${projOpts(x.project)}</select></td>
-      <td><select class="btype">${typeOpts(x.type)}</select></td>
-      <td><input class="bname" value="${esc(x.name)}"></td>
-      <td><input class="breq" value="${esc(x.requirement)}" placeholder="要求/备注"></td>
-      <td class="${!x.start?'cell-warn':''}"><input type="date" class="bstart" value="${esc(x.start)}"></td>
-      <td class="${x.dueUncertain?'cell-warn':''}"><input type="date" class="bdue" value="${esc(x.due)}"></td>
-      <td><select class="bstatus">${statusOpts(x.status)}</select></td>
-      <td><button class="btn sm ghost bdel">删除</button></td>
-    </tr>`).join('');
+  const card = (x,i)=>`
+    <div class="batch-card" data-i="${i}">
+      <div class="bc-line bc-meta">
+        <span class="bc-idx">${i+1}</span>
+        <span class="bc-field${x.projUncertain?' warn':''}"><label>项目</label><select class="bproj">${projOpts(x.project)}</select></span>
+        <span class="bc-field"><label>类型</label><select class="btype">${typeOpts(x.type)}</select></span>
+        <span class="bc-field"><label>状态</label><select class="bstatus">${statusOpts(x.status)}</select></span>
+        <span class="bc-field${!x.start?' warn':''}"><label>起始</label><input type="date" class="bstart" value="${esc(x.start)}"></span>
+        <span class="bc-field${x.dueUncertain?' warn':''}"><label>预计交付</label><input type="date" class="bdue" value="${esc(x.due)}"></span>
+        <button class="btn sm ghost bdel">删除</button>
+      </div>
+      <div class="bc-line bc-content">
+        <span class="bc-field bc-name"><label>任务名称 *</label><input class="bname" value="${esc(x.name)}"></span>
+        <span class="bc-field bc-req"><label>任务要求</label><input class="breq" value="${esc(x.requirement)}" placeholder="要求/备注"></span>
+        <span class="bc-field bc-rel"><label>母任务（同项目·可二级）</label>
+          <span class="rel-cascade">
+            <select class="brel1">${relL1OptionsHTML(x.project,'')}</select><select class="brel2" style="display:none"></select>
+          </span>
+        </span>
+      </div>
+    </div>`;
+  const cards = parsed.map((x,i)=>card(x,i)).join('');
   $('#batchPreview').innerHTML = `
-    <div class="batch-summary">共识别 <b id="batchCnt">${parsed.length}</b> 条任务（标黄 = 识别不确定，可改）</div>
-    <div style="overflow:auto;max-height:46vh">
-    <table class="board" id="batchTable"><thead><tr><th>#</th><th>项目</th><th>类型</th><th>任务名称</th><th>任务要求</th><th>起始</th><th>预计交付</th><th>状态</th><th></th></tr></thead>
-    <tbody id="batchTbody">${rows}</tbody></table></div>`;
+    <div class="batch-summary">共识别 <b id="batchCnt">${parsed.length}</b> 条任务（标黄 = 识别不确定，可改；每条独立小窗编辑，先选项目再选「母任务」，可选二级层级）</div>
+    <div id="batchTbody" class="batch-cards">${cards}</div>`;
   $('#batchFoot').style.display='block';
-  $('#batchTbody').querySelectorAll('.bdel').forEach(b=>b.addEventListener('click',e=>{
-    e.target.closest('tr').remove();
-    const cnt=$('#batchTbody').children.length;
-    const c=$('#batchCnt'); if(c) c.textContent=cnt;
-    if(cnt===0){ $('#batchFoot').style.display='none'; $('#batchPreview').innerHTML='<p class="hint" style="margin-top:12px">已全部删除。</p>'; }
-  }));
+  const refreshBrel2 = card =>{
+    const l1=card.querySelector('.brel1').value, l2=card.querySelector('.brel2');
+    const opts=relL2OptionsHTML(l1,'');
+    if(opts){ l2.innerHTML=opts; l2.style.display='inline-block'; } else { l2.style.display='none'; }
+  };
+  const refreshBrel1 = card =>{ card.querySelector('.brel1').innerHTML=relL1OptionsHTML(card.querySelector('.bproj').value,''); refreshBrel2(card); };
+  const childClass = card =>{ card.classList.toggle('batch-child', !!(card.querySelector('.brel1').value || card.querySelector('.brel2').value)); };
+  $('#batchTbody').querySelectorAll('.batch-card').forEach(card=>{
+    card.querySelector('.bdel').addEventListener('click',e=>{
+      e.target.closest('.batch-card').remove();
+      const cnt=$('#batchTbody').children.length;
+      const c=$('#batchCnt'); if(c) c.textContent=cnt;
+      if(cnt===0){ $('#batchFoot').style.display='none'; $('#batchPreview').innerHTML='<p class="hint" style="margin-top:12px">已全部删除。</p>'; }
+    });
+    card.querySelector('.bproj').addEventListener('change',()=>{ refreshBrel1(card); childClass(card); });
+    card.querySelector('.brel1').addEventListener('change',()=>{ refreshBrel2(card); childClass(card); });
+    card.querySelector('.brel2').addEventListener('change',()=>{ childClass(card); });
+  });
 }
 
 function confirmBatch(){
@@ -798,19 +998,22 @@ function confirmBatch(){
   rows.forEach(tr=>{
     const name=tr.querySelector('.bname').value.trim();
     const requirement=tr.querySelector('.breq').value.trim();
-    const project=tr.querySelector('.bproj').value;
     const type=tr.querySelector('.btype').value;
     const start=tr.querySelector('.bstart').value;
     const due=tr.querySelector('.bdue').value;
     const status=tr.querySelector('.bstatus').value;
+    const relId=tr.querySelector('.brel2').value || tr.querySelector('.brel1').value;
     if(!name){ skipped++; return; }
+    const par=relId?state.tasks.find(x=>x.id===relId):null;
+    let project=tr.querySelector('.bproj').value;
+    if(par && par.project) project=par.project;   // 子任务跟随母任务项目
     if(project && project!=='待定'){ if(!projectExists(project)) state.projectOrder.push(project); }
     else if(project==='待定'){ if(!projectExists('待定')) state.projectOrder.push('待定'); }
     const b=baseNameOf(name);
     const v=nextVersionFor(b);
-    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:'',version:v,feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:status||'未完成',createdAt:nowISO(),updatedAt:nowISO()};
+    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId||'',version:v,feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:status||'未完成',createdAt:nowISO(),updatedAt:nowISO()};
     state.tasks.push(task);
-    addLog('add', task.id, `批量录入·新增任务《${b}》${project?('（'+project+'）'):''}`);
+    addLog('add', task.id, `批量录入·新增任务《${b}》${relId?'(子任务)':''}${project?('（'+project+'）'):''}`);
     n++;
   });
   addLog('batch','',`批量录入 ${n} 条任务`);
@@ -831,6 +1034,52 @@ function filteredTasks(){
   list.sort((a,b)=> (a.start||'').localeCompare(b.start||'') * (state.roadmapSort==='asc'?1:-1));
   return list;
 }
+
+/* ============ 母/子任务（树形）辅助 ============ */
+function childTasksOf(id){ return state.tasks.filter(t=>t.related===id); }
+function isParentTask(t){ return state.tasks.some(c=>c.related===t.id); }
+function parentOf(t){ return t.related ? state.tasks.find(x=>x.id===t.related) : null; }
+function wouldCreateCycle(childId, parentId){
+  if(!parentId || parentId===childId) return false;
+  let cur=parentId; const seen=new Set();
+  while(cur){ if(cur===childId) return true; if(seen.has(cur)) return true; seen.add(cur);
+    const p=state.tasks.find(x=>x.id===cur); cur = p? p.related : ''; }
+  return false;
+}
+/* 可作为母任务的候选：排除自身及其后代（防环），避免把子任务设为自己的祖先；
+   proj 非空时仅限同项目（母/子任务按项目作用域隔离） */
+function parentCandidates(excludeId, proj){
+  const banned=new Set([excludeId]);
+  let changed=true;
+  while(changed){ changed=false; state.tasks.forEach(t=>{ if(banned.has(t.related) && !banned.has(t.id)){ banned.add(t.id); changed=true; } }); }
+  return state.tasks.filter(t=>!banned.has(t.id) && t.id!==excludeId && (!proj || t.project===proj));
+}
+/* 某任务的顶级祖先（related='' 的那一层）id —— 用于级联定位母任务所处层 */
+function topAncestorId(id){
+  let cur=id; const seen=new Set();
+  while(true){ if(seen.has(cur)) return cur; seen.add(cur);
+    const t=state.tasks.find(x=>x.id===cur);
+    if(!t || !t.related) return cur; cur=t.related; }
+}
+/* 项目内顶级任务（related=''），即级联第一级母任务候选 */
+function projectParents(proj){ return state.tasks.filter(t=>(t.project===proj) && t.related===''); }
+/* 级联下拉选项：一级母任务（项目内顶级任务） / 二级母任务（某母任务的子任务） */
+function relL1OptionsHTML(proj, sel){
+  if(!proj) return '<option value="">— 请先选择项目</option>';
+  const opts = projectParents(proj).map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>${esc(x.name)}</option>`).join('');
+  return '<option value="">—（新建为顶级任务）</option>'+opts;
+}
+function relL2OptionsHTML(l1, sel){
+  if(!l1) return '';
+  const kids = state.tasks.filter(t=>t.related===l1);
+  if(!kids.length) return '';
+  return '<option value="">—（直接挂在母任务下）</option>'+kids.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>${esc(x.name)}</option>`).join('');
+}
+/* 展开/收起母任务（持久化） */
+function toggleParentExpand(id){ const a=state.expandedParents; const i=a.indexOf(id); if(i>=0)a.splice(i,1); else a.push(id); save(); renderRoadmap(); }
+/* 把一批子任务提升为独立任务（related 清空） */
+function promoteKids(ids){ ids.forEach(cid=>{ const c=state.tasks.find(x=>x.id===cid); if(c) c.related=''; }); }
+
 function renderRoadmap(){
   const isAll = state.currentProject==='all';
   if(isAll){
@@ -847,7 +1096,10 @@ function renderRoadmap(){
       </div>`;
     }).join('');
     setMain(pageHeader('02','Roadmap','ROADMAP','选择一个项目，查看其专属时间线') + `<div class="proj-grid">${cards}</div><p class="hint">点击项目进入其专属看板 / 甘特图（各项目互不混合）。</p>`);
-    document.querySelectorAll('#main .proj-card').forEach(c=>c.addEventListener('click',()=>go('roadmap', c.dataset.p)));
+    document.querySelectorAll('#main .proj-card').forEach(c=>{
+      c.addEventListener('click',()=>go('roadmap', c.dataset.p));
+      c.addEventListener('contextmenu',e=>{ e.preventDefault(); showProjectMenu(e.clientX, e.clientY, c.dataset.p); });
+    });
     return;
   }
   const title = isAll? '全部项目 · Roadmap' : `${state.currentProject} · 项目看板`;
@@ -867,13 +1119,25 @@ function renderRoadmap(){
   let body;
   if(state.roadmapView==='board'){
     const cols = (isAll?'<th>项目</th>':'') + '<th>任务名称</th><th>任务要求</th><th>任务类型</th><th>进度</th><th>交付成果</th><th>反馈意见</th><th>难点和动作</th><th>负责人</th><th>起始</th><th>预计交付</th><th>实际交付</th><th></th>';
-    const rows = filteredTasks().map(t=>{
-      return `<tr>
-        ${isAll?`<td title="${esc(t.project)}"><span class="pill">${esc(t.project)}</span></td>`:''}
-        <td title="${esc(t.name)}"><span class="dot d-${esc(t.status)}"></span>${t.version && t.version!=='v1'?`<span class="ver">${esc(t.version)}</span>`:''}${esc(t.name)}</td>
+    const base = filteredTasks();
+    const baseIds = new Set(base.map(t=>t.id));
+    const byParent = {};
+    base.forEach(t=>{ const k=(t.related && baseIds.has(t.related))?t.related:''; (byParent[k]=byParent[k]||[]).push(t); });
+    Object.values(byParent).forEach(arr=>arr.sort((a,b)=> (a.start||'').localeCompare(b.start||'') * (state.roadmapSort==='asc'?1:-1)));
+    const rows=[];
+    const renderNode=(t,depth)=>{
+      const kids=(byParent[t.id]||[]);
+      const hasKids=kids.length>0;
+      const expanded=state.expandedParents.includes(t.id);
+      const prog = hasKids? Math.round(kids.reduce((s,c)=>s+(+c.progress||0),0)/kids.length) : (t.progress||0);
+      const toggle = hasKids ? `<span class="tw-toggle">${expanded?'▾':'▸'}</span>` : `<span class="tw-toggle dim">·</span>`;
+      const badge = hasKids ? `<span class="tw-badge">📂 ${kids.length}</span>` : '';
+      rows.push(`<tr class="${depth?'child-row':''}" data-id="${t.id}" style="--d:${depth}">
+        ${isAll?`<td class="proj-cell"><span class="pill">${esc(t.project)}</span></td>`:''}
+        <td class="name-cell" ${hasKids?`data-toggle="${t.id}"`:''}><span class="tw-indent"><span class="dot d-${esc(t.status)}"></span>${toggle}${badge}${depth?`<span class="tw-child">↳ </span>`:''}${t.version && t.version!=='v1'?`<span class="ver">${esc(t.version)}</span>`:''}${esc(t.name)}</span></td>
         <td title="${esc(t.requirement||'')}">${esc(t.requirement||'—')}</td>
         <td title="${esc(t.type)}"><span class="pill">${esc(t.type)}</span></td>
-        <td title="${t.progress||0}% 完成"><div class="prog"><i style="width:${t.progress||0}%"></i></div>${t.progress||0}%</td>
+        <td title="${prog}% 完成"><div class="prog"><i style="width:${prog}%"></i></div>${prog}%</td>
         <td title="${esc(t.deliverable||'—')}">${esc(t.deliverable||'—')}</td>
         <td title="${esc(t.feedback||'—')}">${esc(t.feedback||'—')}</td>
         <td title="${esc(t.difficulty||'—')}">${esc(t.difficulty||'—')}</td>
@@ -881,14 +1145,17 @@ function renderRoadmap(){
         <td title="${esc(t.start||'')}">${fmt(t.start)}</td>
         <td title="${esc(t.due||'')}">${fmt(t.due)}</td>
         <td title="${esc(t.actual||'')}">${fmt(t.actual)||'—'}</td>
-        <td><button class="btn sm ghost" data-edit="${t.id}">编辑</button></td>
-      </tr>`;
-    }).join('');
-    body = `<table class="board"><thead><tr>${cols}</tr></thead><tbody>${rows||'<tr><td colspan="20" class="muted">无匹配任务</td></tr>'}</tbody></table>`;
+        <td class="act-cell"><button class="btn sm ghost" data-edit="${t.id}">编辑</button> <button class="btn sm ghost" data-addchild="${t.id}">＋子</button></td>
+      </tr>`);
+      if(hasKids && expanded) kids.forEach(c=>renderNode(c,depth+1));
+    };
+    (byParent['']||[]).forEach(t=>renderNode(t,0));
+    const rowsHTML = rows.join('') || '<tr><td colspan="20" class="muted">无匹配任务</td></tr>';
+    body = `<table class="board"><thead><tr>${cols}</tr></thead><tbody>${rowsHTML}</tbody></table>`;
   } else {
     body = ganttHTML(filteredTasks());
   }
-  setMain(`${pageHeader('02', title, 'ROADMAP', '顶部标签可筛选/排序 · 难点和动作不可点击')}
+  setMain(`${pageHeader('02', title, 'ROADMAP', '顶部标签可筛选/排序 · 点击母任务名展开/收起子任务 · 难点和动作不可点击')}
     ${fl}${tabs}${body}`);
 
   $('#sortBtn').addEventListener('click', ()=>{ state.roadmapSort = state.roadmapSort==='asc'?'desc':'asc'; save(); renderRoadmap(); });
@@ -900,6 +1167,8 @@ function renderRoadmap(){
   $('#vg').addEventListener('click',()=>{ state.roadmapView='gantt'; save(); renderRoadmap(); });
   $('#gAdd')?.addEventListener('click',()=>{ $('#quickInput')&&($('#quickInput').value=''); go('overview'); });
   $('#main').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.edit)));
+  $('#main').querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>toggleParentExpand(b.dataset.toggle)));
+  $('#main').querySelectorAll('[data-addchild]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); const p=state.tasks.find(x=>x.id===b.dataset.addchild); openQuickPreview('', p?{related:p.id,project:p.project}:null); }));
   // 甘特图拖拽
   initGanttDrag();
 }
@@ -1053,7 +1322,7 @@ function ganttHTML(list){
     return `<div class="cell ${wknd} ${isToday}">${d.getDate()}</div>`;
   }).join('');
 
-  const rows = list.map(t=>{
+  const barHTML = (t, indent)=>{
     if(!t.start||!t.due) return '';
     const sD = new Date(t.start), eD = new Date(t.due);
     if(eD < rangeStart || sD > rangeEnd) return '';
@@ -1066,14 +1335,46 @@ function ganttHTML(list){
     const lenDays = Math.round((eD-sD)/86400000)+1;
     const sDOW = sD.getDay();
     const rowCls = (sDOW===0||sDOW===6)?'weekend':'';
-    return `<div class="gantt-row ${rowCls}">
+    return `<div class="gantt-row ${rowCls}${indent?' child':''}">
       <div class="gantt-bar" style="left:${left}%;width:${width}%">
         <span class="lead">${lenDays}天</span>
         <span class="proj">【${esc(t.project)}】</span>
         <span class="name">${esc(t.name)}</span>
       </div>
     </div>`;
-  }).filter(Boolean).join('') || '<div class="gantt-empty">当前视图范围内暂无任务</div>';
+  };
+  const summaryHTML = (parent, kids)=>{
+    const starts=kids.map(c=>c.start).filter(Boolean).sort();
+    const dues=kids.map(c=>c.due).filter(Boolean).sort();
+    if(!starts.length) return '';
+    const sMin=starts[0], dMax=dues[dues.length-1];
+    let sIdx=days.findIndex(d=>dateStr(d)>=sMin); let eIdx=days.findIndex(d=>dateStr(d)>=dMax);
+    if(sIdx<0)sIdx=0; if(eIdx<0)eIdx=totalDays-1;
+    const left=sIdx/totalDays*100, width=Math.max(2,(eIdx-sIdx+1)/totalDays*100);
+    const expanded=state.expandedParents.includes(parent.id);
+    return `<div class="gantt-row parent">
+      <div class="gantt-bar summary" style="left:${left}%;width:${width}%" data-toggle="${parent.id}">
+        <span class="tw-toggle">${expanded?'▾':'▸'}</span>
+        <span class="name">${esc(parent.name)} · ${kids.length}子</span>
+      </div>
+    </div>`;
+  };
+  const base = list;
+  const baseIds = new Set(base.map(t=>t.id));
+  const byParent = {};
+  base.forEach(t=>{ const k=(t.related && baseIds.has(t.related))?t.related:''; (byParent[k]=byParent[k]||[]).push(t); });
+  let rowsHTML='';
+  const renderNode=(t)=>{
+    const kids=(byParent[t.id]||[]);
+    if(kids.length){
+      rowsHTML+=summaryHTML(t,kids);
+      if(state.expandedParents.includes(t.id)) kids.forEach(c=>{ const b=barHTML(c,true); if(b) rowsHTML+=b; });
+    } else {
+      const b=barHTML(t,false); if(b) rowsHTML+=b;
+    }
+  };
+  (byParent['']||[]).forEach(renderNode);
+  const rows = rowsHTML || '<div class="gantt-empty">当前视图范围内暂无任务</div>';
 
   const todayLine = todayIdx>=0 ? `<div class="gantt-today-line" style="left:${(todayIdx+0.5)/totalDays*100}%"></div><div class="gantt-today-label" style="left:${(todayIdx+0.5)/totalDays*100}%">今天</div>` : '';
 
@@ -1098,7 +1399,7 @@ function openEdit(id){
   const t = state.tasks.find(x=>x.id===id); if(!t) return;
   const projOpts = projects().map(pr=>`<option ${pr===t.project?'selected':''}>${esc(pr)}</option>`).join('');
   const typeOpts = TYPES.map(tp=>`<option ${tp===t.type?'selected':''}>${esc(tp)}</option>`).join('');
-  const relOpts = state.tasks.filter(x=>x.id!==id).map(x=>`<option value="${x.id}" ${x.id===t.related?'selected':''}>${esc(x.name)}</option>`).join('');
+  const relOpts = parentCandidates(id, t.project).map(x=>`<option value="${x.id}" ${x.id===t.related?'selected':''}>${esc(x.name)}</option>`).join('');
   const html = `<h3>编辑任务</h3>
     <div class="field"><label>任务名称 *</label><input id="e_name" value="${esc(t.name)}"></div>
     <div class="field"><label>任务要求</label><input id="e_req" value="${esc(t.requirement)}" placeholder="具体要求、备注等"></div>
@@ -1110,7 +1411,8 @@ function openEdit(id){
     <div class="field"><label>整体进度</label><input id="e_prog" type="number" min="0" max="100" value="${t.progress||0}"></div>
     <div class="field"><label>交付成果</label><input id="e_del" value="${esc(t.deliverable)}"></div>
     <div class="field"><label>版本号</label><input id="e_ver" value="${esc(t.version)}" placeholder="如 v1 / v2"></div>
-    <div class="field"><label>主任务</label><select id="e_rel"><option value="">—（本身是主任务）</option>${relOpts}</select></div>
+    <div class="field"><label>主任务（仅同项目可选）</label><select id="e_rel"><option value="">—（本身是主任务）</option>${relOpts}</select></div>
+    ${isParentTask(t)?`<div class="hint" style="margin-top:-4px">该母任务有 ${childTasksOf(t.id).length} 个子任务，看板进度自动取平均；修改项目时子任务会同步跟随。</div>`:''}
     <div class="field"><label>反馈意见</label><input id="e_fb" value="${esc(t.feedback)}" placeholder="子任务相对主任务的反馈 / 修订意见"></div>
     <div class="field"><label>难点和动作</label><input id="e_diff" value="${esc(t.difficulty)}"></div>
     <div class="field"><label>负责人</label><input id="e_owner" value="${esc(t.owner)}"></div>
@@ -1122,11 +1424,44 @@ function openEdit(id){
     </div>`;
   openModal(html);
   $('#eCancel').addEventListener('click',closeModal);
-  $('#eDel').addEventListener('click',()=>{ if(confirm('确认删除该任务？')){ state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete',id,`删除任务《${t.name}》`); save(); closeModal(); render(); } });
+  $('#eDel').addEventListener('click',()=>deleteTaskWithChildren(id));
   $('#eSave').addEventListener('click',()=>{
     Object.assign(t,{name:$('#e_name').value.trim(),requirement:$('#e_req').value.trim(),type:$('#e_type').value,project:$('#e_project').value,start:$('#e_start').value,due:$('#e_due').value,actual:$('#e_actual').value,progress:+$('#e_prog').value,deliverable:$('#e_del').value,related:$('#e_rel').value,version:$('#e_ver').value,feedback:$('#e_fb').value,difficulty:$('#e_diff').value,owner:$('#e_owner').value,status:$('#e_status').value,updatedAt:nowISO()});
+    /* 子任务跟随母任务项目；母任务改项目时子任务同步跟随，保证树在同一看板内 */
+    if(t.related){ const par=parentOf(t); if(par && par.project) t.project=par.project; }
+    childTasksOf(t.id).forEach(c=>{ c.project=t.project; });
     if(!projectExists(t.project)) state.projectOrder.push(t.project);
     addLog('update', t.id, `修改任务《${t.name}》`);
+    save(); closeModal(); render();
+  });
+}
+
+/* ============ 删除任务（含母任务子任务勾选） ============ */
+function deleteTaskWithChildren(id){
+  const t=state.tasks.find(x=>x.id===id); if(!t) return;
+  const kids=childTasksOf(id);
+  if(!kids.length){
+    if(confirm('确认删除任务《'+t.name+'》？')){ state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete',id,`删除任务《${t.name}》`); save(); closeModal(); render(); }
+    return;
+  }
+  const items=kids.map(c=>`<label class="chk"><input type="checkbox" class="delkid" value="${c.id}"> ${esc(c.name)} <span class="muted">（${esc(c.project)} · ${esc(c.status)}）</span></label>`).join('');
+  const html=`<h3>删除母任务《${esc(t.name)}》</h3>
+    <div class="hint">该母任务下有 <b>${kids.length}</b> 个子任务。勾选 = 一并删除；<b>不勾选 = 提升为独立任务</b>（保留数据，不丢失）。</div>
+    <div class="chk-list">${items}</div>
+    <div style="text-align:right;margin-top:14px">
+      <button class="btn ghost sm" id="dtCancel">取消</button>
+      <button class="btn warn sm" id="dtKeep">仅删除母任务（子任务全提升）</button>
+      <button class="btn warn sm" id="dtDel">删除母任务 + 勾选子任务</button>
+    </div>`;
+  openModal(html);
+  $('#dtCancel').addEventListener('click',closeModal);
+  $('#dtKeep').addEventListener('click',()=>{ promoteKids(kids.map(c=>c.id)); state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete',id,`删除母任务《${t.name}》（${kids.length} 子任务提升为独立）`); save(); closeModal(); render(); });
+  $('#dtDel').addEventListener('click',()=>{
+    const delIds=[...document.querySelectorAll('.delkid:checked')].map(c=>c.value);
+    const keepIds=kids.map(c=>c.id).filter(x=>!delIds.includes(x));
+    promoteKids(keepIds);
+    state.tasks=state.tasks.filter(x=>x.id!==id && !delIds.includes(x.id));
+    addLog('delete',id,`删除母任务《${t.name}》${delIds.length?` + ${delIds.length} 子任务`:''}`);
     save(); closeModal(); render();
   });
 }
@@ -1211,7 +1546,7 @@ function openFilePreview(text){
     const name=$('#f_name').value.trim();
     const url=$('#f_url').value.trim();
     const project=$('#f_proj').value;
-    const type=$('#f_type').value;
+    const type=$('#modalBg #f_type').value;
     const uploaded=$('#f_up').value;
     if(!name||!project||!type||!uploaded){ alert('必填：文件名、项目、文件类型、上传日期'); return; }
     state.files.push({id:uid(),name,url,project,type,uploaded,note:$('#f_note').value,createdAt:nowISO()});
@@ -1243,7 +1578,7 @@ function openFileEdit(id){
     const name=$('#f_name').value.trim();
     const url=$('#f_url').value.trim();
     const project=$('#f_proj').value;
-    const type=$('#f_type').value;
+    const type=$('#modalBg #f_type').value;
     const uploaded=$('#f_up').value;
     if(!name||!project||!type||!uploaded){ alert('必填：文件名、项目、文件类型、上传日期'); return; }
     Object.assign(f,{name,url,project,type,uploaded,note:$('#f_note').value,updatedAt:nowISO()});
@@ -1361,6 +1696,11 @@ document.querySelectorAll('#nav a[data-route]').forEach(a=>{
   a.addEventListener('click',()=>go(a.dataset.route));
 });
 $('#navRoadmap').addEventListener('click',()=>{ $('#projectList').classList.toggle('hidden'); });
+$('#navAddProj').addEventListener('click',e=>{ e.stopPropagation(); openAddProject(); });
+/* 右键菜单：任意点击 / 滚动 / 退出键即隐藏 */
+document.addEventListener('click',hideProjectMenu);
+document.addEventListener('scroll',hideProjectMenu,true);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideProjectMenu(); });
 
 /* ============ 启动 ============ */
 load();
