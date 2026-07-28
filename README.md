@@ -6,7 +6,6 @@
 
 **点击进入应用**：https://suul-chen.github.io/work-buddy-version/work-buddy-version.html
 
-**v5 历史快照**：https://suul-chen.github.io/work-buddy-version/v5.html
 
 ---
 
