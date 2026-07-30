@@ -83,9 +83,9 @@ main{flex:1;padding:36px 48px 56px;overflow:auto;max-width:100%}
 
 /* metrics */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--ink);margin-bottom:18px;background:#fff}
-.metric{padding:18px 20px;border-right:1px solid var(--ink);position:relative;background:#fff;transition:background .2s}
+.metric{padding:18px 20px;border-right:1px solid var(--ink);position:relative;background:#fff;transition:background .2s;cursor:pointer}
 .metric:last-child{border-right:0}
-.metric:hover{background:#fafaf6}
+.metric:hover{background:#fafaf6;box-shadow:inset 0 0 0 2px var(--accent)}
 .metric .n{font-size:38px;font-weight:900;line-height:1;letter-spacing:-1px}
 .metric .l{font-size:10px;letter-spacing:2px;font-weight:800;color:var(--sub);margin-top:8px;text-transform:uppercase}
 .metric .acc{position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--accent)}
@@ -103,13 +103,13 @@ ul.tl li .ts{color:var(--sub);font-size:11px;min-width:110px;font-weight:800;let
 .pill{display:inline-block;padding:2px 9px;font-size:11px;font-weight:800;letter-spacing:1px;border:1.5px solid var(--ink);background:#fff;margin-right:4px;text-transform:uppercase}
 .pill.acc{border-color:var(--accent);color:var(--accent)}
 .pill.ghost{border-color:var(--line);color:var(--sub)}
-.st-未完成{border-color:var(--ink);color:var(--ink)}
-.st-正在进行{background:var(--ink);color:#fff;border-color:var(--ink)}
+.st-未开始{border-color:var(--ink);color:var(--ink)}
+.st-进行中{background:var(--ink);color:#fff;border-color:var(--ink)}
 .st-已交付{background:var(--accent);color:#fff;border-color:var(--accent)}
 .dot{display:inline-block;width:10px;height:10px;margin-right:8px;border:1.5px solid var(--ink);vertical-align:-1px}
 .dot.d-已交付{background:var(--ink);border-color:var(--ink)}
-.dot.d-正在进行{background:var(--accent);border-color:var(--accent)}
-.dot.d-未完成{background:#fff;border-color:var(--ink)}
+.dot.d-进行中{background:var(--accent);border-color:var(--accent)}
+.dot.d-未开始{background:#fff;border-color:var(--ink)}
 .ver{display:inline-block;font-size:11px;font-weight:800;color:var(--accent);background:#fff;border:1.5px solid var(--accent);border-radius:4px;padding:0 5px;margin-right:6px;vertical-align:1px;letter-spacing:.5px}
 
 /* filter bar */
@@ -179,6 +179,7 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
 .field label{display:block;font-size:10px;letter-spacing:2px;font-weight:800;color:var(--sub);margin-bottom:5px;text-transform:uppercase}
 .field input,.field select,.field textarea{width:100%;border:2px solid var(--ink);padding:8px 10px;font-size:13px;font-family:inherit;border-radius:0;background:#fff}
 .field input:focus,.field select:focus,.field textarea:focus{outline:0;box-shadow:4px 4px 0 var(--accent)}
+.field textarea.auto-resize{resize:vertical;min-height:42px;overflow-y:hidden;line-height:1.5}
 .field .req{color:var(--accent)}
 .rel-cascade{display:flex;gap:8px;flex-wrap:wrap}
 .rel-cascade select{flex:1 1 160px;min-width:0}
@@ -484,6 +485,82 @@ textarea.edit{min-height:150px;background:#fffdf8}
   backdrop-filter:blur(10px);
   border-radius:0 0 26px 26px;
 }
+
+/* 指标卡详情弹窗 - 任务条表格 */
+.dt-table{max-height:55vh;overflow-y:auto;padding:4px 0}
+.dt-head{display:grid;grid-template-columns:2fr 1.5fr 100px 100px 100px;gap:8px;padding:8px 12px;background:#f5f0e6;font-size:10px;font-weight:800;letter-spacing:1px;color:var(--sub);border-bottom:2px solid var(--ink);text-transform:uppercase}
+.dt-row{display:grid;grid-template-columns:2fr 1.5fr 100px 100px 100px;gap:8px;padding:10px 12px;border-bottom:1px solid #ede5d5;align-items:center;transition:background .15s}
+.dt-row:hover{background:#faf6ee}
+.dt-row .dt-name{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dt-row .dt-req,.dt-row .dt-del{font-size:11px;color:#7a7066;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dt-row .dt-date{font-size:11px;color:var(--sub);text-align:center;font-variant-numeric:tabular-nums}
+.dt-row .dt-actual{color:var(--ok);font-weight:700}
+.dt-section{margin-bottom:8px}
+.dt-st-header{padding:10px 12px 6px;font-size:14px;font-weight:900;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--ink);margin-top:8px}
+.dt-section:first-child .dt-st-header{margin-top:0}
+.dt-proj-group{margin-bottom:4px}
+.dt-proj-name{padding:6px 12px;font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.5px;background:rgba(230,57,70,.06);border-radius:6px;margin:6px 0 2px}
+
+/* 代办弹窗 - 左右分布 */
+.todo-split{display:flex;gap:16px}
+.todo-col{flex:1;display:flex;flex-direction:column;gap:6px}
+.todo-label{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--ink);text-transform:uppercase}
+
+/* ============ 工作日志（飞书式小卡片 + 放大详情） ============ */
+.log-filters{display:flex;gap:6px;flex-wrap:wrap}
+.logf{border:1px solid #d8d0c3;background:#fffdf8;color:#5a534a;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .15s}
+.logf:hover{border-color:var(--accent)}
+.logf.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.log-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:8px}
+.log-card{border:1.5px solid #e3dccd;background:#fff;border-radius:14px;padding:11px 13px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.log-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+.log-card.log-add::before{background:#2f9e44}
+.log-card.log-upd::before{background:#1971c2}
+.log-card.log-del::before{background:#e03131}
+.log-card.log-file::before{background:#f08c00}
+.log-card.log-rep::before{background:#7048e8}
+.log-card.log-batch::before{background:#0c8599}
+.log-card:hover{box-shadow:0 8px 20px rgba(20,20,20,.08);transform:translateY(-2px)}
+.log-card-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.log-ic{font-size:13px}
+.log-verb{font-size:12px;font-weight:800;color:var(--ink)}
+.log-time{margin-left:auto;font-size:11px;color:var(--sub);font-variant-numeric:tabular-nums}
+.log-card-proj{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.log-target{color:var(--ink);font-weight:700;font-size:12px}
+.log-card-sum{margin-top:6px;font-size:11px;color:#6b6358;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* 放大详情 */
+.log-detail-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 14px;font-size:12px}
+.log-dt-name{font-weight:800;color:var(--ink)}
+.log-diff{display:flex;flex-direction:column;gap:8px}
+.diff-row{display:flex;align-items:center;gap:10px;background:#faf7f0;border:1px solid #ece4d6;border-radius:10px;padding:9px 12px;font-size:12px}
+.diff-field{flex:0 0 92px;font-weight:800;color:var(--ink)}
+.diff-from{color:#86807a;text-decoration:line-through;text-decoration-color:#d0c9bd}
+.diff-arrow{color:var(--accent);font-weight:900}
+.diff-to{color:var(--ink);font-weight:700}
+.diff-row .empty{color:#bbb;font-style:italic}
+.log-sum-only{background:#faf7f0;border:1px solid #ece4d6;border-radius:10px;padding:12px;font-size:13px;line-height:1.6;color:#4a443c}
+.log-dt-sum{background:#f6f8fb;border:1px solid #e6ecf3;border-radius:10px;padding:9px 12px;margin:10px 0 2px;font-size:13px;color:#3a4a5a;line-height:1.6}
+.log-note{font-size:12px;color:#86807a;margin:2px 0 8px;line-height:1.5}
+.log-kv{display:flex;flex-direction:column;gap:6px}
+.kv-row{display:flex;align-items:center;gap:10px;background:#faf7f0;border:1px solid #ece4d6;border-radius:10px;padding:7px 12px;font-size:12px}
+.kv-k{flex:0 0 92px;font-weight:800;color:var(--ink)}
+.kv-v{color:var(--ink)}
+
+/* 跳转后目标任务条闪烁定位（两次，等速） */
+@keyframes rowFlash{
+  0%,100%{ background:#fff; box-shadow:none; }
+  50%{ background:rgba(230,57,70,.30); box-shadow:0 0 0 2px var(--accent), 0 0 14px rgba(230,57,70,.35); }
+}
+tr.flash{ animation:rowFlash .55s ease 2; }
+
+/* 概况页最近动态紧凑行 */
+.ov-log-list{display:flex;flex-direction:column;gap:2px}
+.ov-log-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:12px}
+.ov-log-row:hover{background:#faf6ee}
+.ov-log-time{color:var(--sub);font-variant-numeric:tabular-nums;flex:0 0 42px}
+.ov-log-ic{flex:0 0 auto;font-size:13px}
+.ov-log-ctx{flex:0 0 auto;font-weight:800;color:var(--ink);max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-log-sum{flex:1;color:#6b6358;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* controls */
 .btn{
@@ -1391,7 +1468,7 @@ body{
 /* 默认类型列表（可被 state.customTypes 覆盖） */
 const DEFAULT_TYPES = ['调研类','文案撰写类','文案宣传类','设计类','执行协调类','其他'];
 function getTypes(){ return (state && state.customTypes && state.customTypes.length) ? state.customTypes : DEFAULT_TYPES; }
-const STATUSES = ['未完成','正在进行','已交付'];
+const STATUSES = ['未开始','进行中','已交付'];
 const OWNER_DEFAULT = '陈世维';
 const YEAR = 2026;
 /* 星期映射：周一=1 … 周日=0（与 JS getDay 对齐） */
@@ -1432,6 +1509,15 @@ function normalize(){
   if(!Array.isArray(state.expandedParents)) state.expandedParents=[];
   if(!state.ganttAnchor) state.ganttAnchor=todayStr();
   if(!Array.isArray(state.customTypes)) state.customTypes = [];
+  if(!Array.isArray(state.logs)) state.logs = [];
+  state.logs.forEach(l=>{
+    if(l.targetType===undefined) l.targetType = (l.taskId? 'task' : 'report');
+    if(l.targetId===undefined) l.targetId = l.taskId||'';
+    if(l.targetName===undefined) l.targetName = (l.text||'').replace(/^[【\[].*?[\]】]\s*/, '').replace(/^[添加修改删除].*?《|》.*$/g,'') || (l.text||'');
+    if(l.projectName===undefined) l.projectName = '';
+    if(!Array.isArray(l.changes)) l.changes = [];
+    if(l.summary===undefined) l.summary = l.text||'';
+  });
   state.files.forEach(f=>{ if(f.url===undefined) f.url=''; });
   state.tasks.forEach(t=>{
     if(!Array.isArray(t.linkedFiles)) t.linkedFiles=[];
@@ -1450,16 +1536,16 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 
 /* ============ 种子数据（按照片字段：招商局 / 特发集团） ============ */
 function seed(){
-  const t = (o)=>Object.assign({id:uid(),progress:0,deliverable:'',related:'',version:'',feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:'未完成',createdAt:nowISO(),updatedAt:nowISO()}, o);
+  const t = (o)=>Object.assign({id:uid(),progress:0,deliverable:'',related:'',version:'',feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:'未开始',createdAt:nowISO(),updatedAt:nowISO()}, o);
   const tasks = [
     t({name:'完成磷酸铁锂电池行业研究报告',type:'调研类',project:'招商局',start:'2026-07-06',due:'2026-07-10',actual:'2026-07-09',progress:100,deliverable:'行业研究报告PPT',difficulty:'一手数据难获取→已联系学长',status:'已交付'}),
     t({name:'整理招商局面试话术',type:'文案撰写类',project:'招商局',start:'2026-07-08',due:'2026-07-12',actual:'2026-07-14',progress:100,deliverable:'面试话术文档',difficulty:'表达不流畅→多次录音复盘',status:'已交付'}),
-    t({name:'招商局终面PPT制作',type:'设计类',project:'招商局',start:'2026-07-15',due:'2026-07-20',progress:60,deliverable:'终面PPT',difficulty:'排版耗时→套用模板',status:'正在进行'}),
-    t({name:'招商局宣讲会物料设计',type:'文案宣传类',project:'招商局',start:'2026-07-18',due:'2026-07-25',progress:40,deliverable:'宣讲会海报/折页',status:'正在进行'}),
+    t({name:'招商局终面PPT制作',type:'设计类',project:'招商局',start:'2026-07-15',due:'2026-07-20',progress:60,deliverable:'终面PPT',difficulty:'排版耗时→套用模板',status:'进行中'}),
+    t({name:'招商局宣讲会物料设计',type:'文案宣传类',project:'招商局',start:'2026-07-18',due:'2026-07-25',progress:40,deliverable:'宣讲会海报/折页',status:'进行中'}),
     t({name:'特发集团业务调研',type:'调研类',project:'特发集团',start:'2026-07-06',due:'2026-07-09',actual:'2026-07-09',progress:100,deliverable:'业务调研表',status:'已交付'}),
-    t({name:'特发集团推文撰写',type:'文案撰写类',project:'特发集团',start:'2026-07-10',due:'2026-07-14',progress:50,deliverable:'公众号推文',status:'正在进行'}),
-    t({name:'特发集团数据整理',type:'执行协调类',project:'特发集团',start:'2026-07-20',due:'2026-07-24',progress:0,deliverable:'数据汇总表',status:'未完成'}),
-    t({name:'特发集团宣传视频脚本',type:'文案宣传类',project:'特发集团',start:'2026-07-22',due:'2026-07-28',progress:10,deliverable:'视频脚本',difficulty:'创意卡壳→参考竞品',status:'未完成'})
+    t({name:'特发集团推文撰写',type:'文案撰写类',project:'特发集团',start:'2026-07-10',due:'2026-07-14',progress:50,deliverable:'公众号推文',status:'进行中'}),
+    t({name:'特发集团数据整理',type:'执行协调类',project:'特发集团',start:'2026-07-20',due:'2026-07-24',progress:0,deliverable:'数据汇总表',status:'未开始'}),
+    t({name:'特发集团宣传视频脚本',type:'文案宣传类',project:'特发集团',start:'2026-07-22',due:'2026-07-28',progress:10,deliverable:'视频脚本',difficulty:'创意卡壳→参考竞品',status:'未开始'})
   ];
   const logs = [
     l('2026-07-06 09:12','add','','新增任务《完成磷酸铁锂电池行业研究报告》（招商局）'),
@@ -1576,9 +1662,45 @@ function findInlineProject(line, discovered){
   return '';
 }
 
-function addLog(action,taskId,text){
-  state.logs.unshift({id:uid(),ts:nowISO(),action,taskId,text});
+/* 字段中文标签（用于日志 diff 展示） */
+const LOG_FIELD_LABELS = {
+  name:'任务名称', requirement:'任务要求', type:'任务类型', project:'项目',
+  start:'起始时间', due:'预计交付日期', actual:'实际交付日期', progress:'进度',
+  deliverable:'交付成果', version:'版本号', related:'主任务', feedback:'反馈意见',
+  difficulty:'难点和动作', owner:'负责人', status:'状态', url:'分享链接'
+};
+/* 对比两个对象，产出字段级变更数组 [{field, from, to}] */
+function diffTask(oldT, newT, keys){
+  if(!keys) keys = Object.keys(LOG_FIELD_LABELS);
+  const changes = [];
+  keys.forEach(k=>{
+    const a = oldT && oldT[k]==null ? '' : (oldT? String(oldT[k]) : '');
+    const b = newT && newT[k]==null ? '' : (newT? String(newT[k]) : '');
+    if(a!==b) changes.push({field:k, from:a, to:b});
+  });
+  return changes;
+}
+function addLog(action, targetType, targetId, targetName, projectName, changes, summary){
+  state.logs.unshift({
+    id:uid(), ts:nowISO(), action,
+    targetType: targetType||'task',
+    targetId: targetId||'',
+    targetName: targetName||'',
+    projectName: projectName||'',
+    changes: changes||[],
+    summary: summary||''
+  });
   save();
+}
+/* 新建类操作：把新对象的关键字段拍成「（空）→ 值」快照，便于打开卡片查看新增内容 */
+const ADD_SNAPSHOT_FIELDS = ['type','project','start','due','actual','status','progress','version','owner','deliverable','feedback','difficulty'];
+function snapshotFields(obj, fields){
+  const out = [];
+  (fields||Object.keys(LOG_FIELD_LABELS)).forEach(f=>{
+    const v = obj[f]==null ? '' : String(obj[f]);
+    if(v!=='') out.push({field:f, from:'', to:v});
+  });
+  return out;
 }
 
 function setMain(html){ document.getElementById('main').innerHTML = '<div class="view-enter">' + html + '</div>'; }
@@ -1677,7 +1799,7 @@ function addProject(raw){
   if(!name) return;
   if(state.projectOrder.includes(name)){ alert('项目「'+name+'」已存在'); return; }
   state.projectOrder.push(name);
-  addLog('add', null, `新建项目《${name}》`);
+  addLog('add', 'project', '', `《${name}》`, name, [], `新建项目《${name}》`);
   save(); render(); go('roadmap', name);
 }
 function openRenameProject(old){
@@ -1704,14 +1826,14 @@ function renameProject(old, raw){
     state.files.forEach(f=>{ if(f.project===old) f.project=name; });
     state.projectOrder = state.projectOrder.filter(p=>p!==old);
     if(state.currentProject===old) state.currentProject=name;
-    addLog('update', null, `项目《${old}》并入《${name}》`);
+    addLog('update', 'project', '', `《${old}》`, old, [{field:'project',from:old,to:name}], `项目《${old}》并入《${name}》`);
   } else {
     const i = state.projectOrder.indexOf(old);
     if(i>=0) state.projectOrder[i]=name;
     state.tasks.forEach(t=>{ if(t.project===old) t.project=name; });
     state.files.forEach(f=>{ if(f.project===old) f.project=name; });
     if(state.currentProject===old) state.currentProject=name;
-    addLog('update', null, `项目《${old}》重命名为《${name}》`);
+    addLog('update', 'project', '', `《${old}》`, old, [{field:'project',from:old,to:name}], `项目《${old}》重命名为《${name}》`);
   }
   save(); render();
 }
@@ -1725,7 +1847,7 @@ function deleteProject(name){
   if(n) state.tasks = state.tasks.filter(t=>t.project!==name);
   if(m) state.files = state.files.filter(f=>f.project!==name);
   if(state.currentProject===name) state.currentProject='all';
-  addLog('delete', null, `删除项目《${name}》${n||m?`（含 ${n} 任务 / ${m} 文件）`:''}`);
+  addLog('delete', 'project', '', `《${name}》`, name, [], `删除项目《${name}》${n||m?`（含 ${n} 任务 / ${m} 文件）`:''}`);
   save(); render();
 }
 
@@ -1737,8 +1859,8 @@ function renderOverview(){
   const wk = state.tasks.filter(t=> inWeek(t.start) || inWeek(t.due) || inWeek(t.actual));
   const wTotal = wk.length;
   const wDone = wk.filter(t=>t.status==='已交付').length;
-  const wDoing = wk.filter(t=>t.status==='正在进行').length;
-  const wUndone = wk.filter(t=>t.status==='未完成').length;
+  const wDoing = wk.filter(t=>t.status==='进行中').length;
+  const wUndone = wk.filter(t=>t.status==='未开始').length;
   const todos = state.reports.filter(r=>r.type==='todo' && r.status==='confirmed').slice(-1)[0];
   const daily = state.reports.filter(r=>r.type==='daily' && r.status==='confirmed').slice(-1)[0];
   const recent = state.logs.slice(0,6);
@@ -1757,19 +1879,19 @@ function renderOverview(){
     <div class="hint">支持自动识别：项目（招商局/特发/特发集团）、任务类型、日期（M/D 或 M月D日）、状态。</div>
   </div>
   <div class="metrics" style="margin-bottom:16px">
-    <div class="metric"><div class="n">${wTotal}</div><div class="l">本周任务总数</div></div>
-    <div class="metric"><div class="n" style="color:var(--ok)">${wDone}</div><div class="l">本周已交付</div></div>
-    <div class="metric"><div class="n" style="color:var(--brand2)">${wDoing}</div><div class="l">本周进行中</div></div>
-    <div class="metric"><div class="n" style="color:var(--warn)">${wUndone}</div><div class="l">本周未完成</div></div>
+    <div class="metric" data-metric="total"><div class="n">${wTotal}</div><div class="l">本周任务总数</div></div>
+    <div class="metric" data-metric="done"><div class="n" style="color:var(--ok)">${wDone}</div><div class="l">本周已交付</div></div>
+    <div class="metric" data-metric="doing"><div class="n" style="color:var(--brand2)">${wDoing}</div><div class="l">本周进行中</div></div>
+    <div class="metric" data-metric="undone"><div class="n" style="color:var(--warn)">${wUndone}</div><div class="l">本周未开始</div></div>
   </div>
   <div class="row">
     <div class="card">
       <div class="section-h">✅ 今日代办（已确认）</div>
       ${todos&&todos.content&&todos.content.todo?`<ul class="tl ov-todo">${todos.content.todo.split('\n').filter(x=>x.trim()).map(x=>`<li>${esc(x.replace(/^[•\-]\s*/,''))}</li>`).join('')}</ul>`:'<p class="muted">尚未生成代办。可用下方按钮生成。</p>'}
     </div>
-    <div class="card">
+      <div class="card">
       <div class="section-h">🕒 最近动态（工作日志）</div>
-      <ul class="tl">${recent.map(x=>`<li><span class="muted">${esc(x.ts)}</span> · ${esc(x.text)}</li>`).join('')||'<li class="muted">暂无</li>'}</ul>
+      <div class="ov-log-list">${recent.length?recent.map(logLineHTML).join(''):'<p class="muted">暂无</p>'}</div>
     </div>
   </div>
   <div class="card">
@@ -1804,6 +1926,97 @@ function renderOverview(){
   $('#expBtn').addEventListener('click', exportData);
   $('#impBtn').addEventListener('click', ()=> $('#impFile').click());
   $('#impFile').addEventListener('change', e=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; });
+  /* 最近动态日志行 → 点击放大 */
+  document.querySelectorAll('#main .ov-log-row[data-logid]').forEach(r=>{
+    r.addEventListener('click', ()=>{ const l=state.logs.find(x=>x.id===r.dataset.logid); if(l) openLogDetail(l); });
+  });
+  /* 指标卡点击 → 详情弹窗 */
+  document.querySelectorAll('#main .metric[data-metric]').forEach(m=>{
+    m.addEventListener('click', ()=> openMetricDetail(m.dataset.metric, {wk, wTotal, wDone, wDoing, wUndone}));
+  });
+}
+
+/* ============ 指标卡详情弹窗 ============ */
+function openMetricDetail(type, ctx){
+  const {wk} = ctx;
+  const titles = {total:'本周任务总数', done:'本周已交付', doing:'本周进行中', undone:'本周未开始'};
+  const statusMap = {total:null, done:'已交付', doing:'进行中', undone:'未开始'};
+  const title = titles[type] || '详情';
+  /* 筛选任务 */
+  let tasks = wk.slice();
+  if(statusMap[type]) tasks = tasks.filter(t=> t.status===statusMap[type]);
+  /* 按项目分组 */
+  const byProj = {};
+  tasks.forEach(t=>{ const p=t.project||'未分配'; (byProj[p]=byProj[p]||[]).push(t); });
+  /* 任务条渲染函数 */
+  const taskRow = (t, opts={})=>{
+    const showActual = opts.showActual || false;
+    const showDeliverable = opts.showDeliverable || false;
+    const fields = [];
+    fields.push(`<span class="dt-name">${esc(t.name)}</span>`);
+    if(opts.showReq && t.requirement) fields.push(`<span class="dt-req">${esc(t.requirement)}</span>`);
+    if(showDeliverable && t.deliverable) fields.push(`<span class="dt-del">${esc(t.deliverable)}</span>`);
+    fields.push(`<span class="dt-date">${esc(t.start||'—')}</span>`);
+    fields.push(`<span class="dt-date">${esc(t.due||'—')}</span>`);
+    if(showActual) fields.push(`<span class="dt-date dt-actual">${esc(t.actual||'—')}</span>`);
+    return `<div class="dt-row" data-id="${t.id}">${fields.join('')}</div>`;
+  };
+  /* 构建内容 */
+  let body = '';
+  if(type==='total'){
+    /* 总数：按状态分组，每组内按项目分组 */
+    ['未开始','进行中','已交付'].forEach(st=>{
+      const stTasks = tasks.filter(t=>t.status===st);
+      if(!stTasks.length) return;
+      const stByProj = {};
+      stTasks.forEach(t=>{ const p=t.project||'未分配'; (stByProj[p]=stByProj[p]||[]).push(t); });
+      body += `<div class="dt-section"><div class="dt-st-header"><span class="dot d-${st}"></span><b>${st}</b> · ${stTasks.length} 条</div>`;
+      Object.entries(stByProj).forEach(([proj,ts])=>{
+        body += `<div class="dt-proj-group"><div class="dt-proj-name">📂 ${esc(proj)}</div>${ts.map(t=>taskRow(t,{showReq:true,showActual:st==='已交付'})).join('')}</div>`;
+      });
+      body += `</div>`;
+    });
+  } else {
+    /* 已交付/进行中/未开始：按项目分组 */
+    if(!tasks.length){ body = '<p class="muted" style="padding:16px;text-center">暂无数据</p>'; }
+    else {
+      Object.entries(byProj).forEach(([proj,ts])=>{
+        body += `<div class="dt-section"><div class="dt-proj-name">📂 ${esc(proj)} · ${ts.length} 条</div>`;
+        body += ts.map(t=>taskRow(t,{
+          showReq: type!=='done',
+          showDeliverable: type==='done',
+          showActual: type==='done'
+        })).join('');
+        body += `</div>`;
+      });
+    }
+  }
+  /* 表头 */
+  let headerRow = '';
+  if(type==='total'){
+    headerRow = `<div class="dt-head"><span>任务名称</span><span>任务要求</span><span>起始</span><span>预计交付</span><span>实际交付</span></div>`;
+  } else if(type==='done'){
+    headerRow = `<div class="dt-head"><span>任务名称</span><span>交付成果</span><span>起始</span><span>预计交付</span><span>实际交付</span></div>`;
+  } else {
+    headerRow = `<div class="dt-head"><span>任务名称</span><span>任务要求</span><span>起始</span><span>预计交付</span></div>`;
+  }
+
+  const html = `<h3>${title} · ${tasks.length} 条任务</h3>
+    <div class="dt-table">${headerRow}${body}</div>
+    <div style="text-align:right;margin-top:12px">
+      <button class="btn ghost sm" id="dtClose">关闭</button>
+    </div>`;
+  openModal(html, true);
+  $('#dtClose').addEventListener('click', closeModal);
+  /* 点击任务行 → 跳转到该任务的看板（如果有的话） */
+  document.querySelectorAll('.dt-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const tid = row.dataset.id;
+      const task = state.tasks.find(x=>x.id===tid);
+      if(task && task.project){ goToTask(task.id); }
+    });
+    row.style.cursor='pointer';
+  });
 }
 
 /* ============ 快速录入：自动识别 ============ */
@@ -1847,7 +2060,9 @@ function nextVersionFor(content){
 }
 function openQuickPreview(text, preset){
   const p = parseQuick(text||'');
-  const base = baseNameOf(p.name) || p.name;
+  /* baseNameOf 仅用于匹配已有任务组（判断版本归属），不截断用户原始输入 */
+  const rawName = (p.name||'').trim();
+  const base = baseNameOf(rawName) || rawName;
   const ver = nextVersionFor(base);
   const matches = state.tasks.filter(t=> baseNameOf(t.name)===base);
   const matchHint = matches.length
@@ -1862,7 +2077,7 @@ function openQuickPreview(text, preset){
   const typePicker = softSelectHTML('f_type', getTypes(), p.type);
   const html = `<h3>识别结果 · 请确认</h3>
     <div class="hint" style="margin-bottom:10px">${matchHint}</div>
-    <div class="field"><label>任务名称 <span class="req">*</span></label><input id="f_name" value="${esc(base)}"></div>
+    <div class="field"><label>任务名称 <span class="req">*</span></label><input id="f_name" value="${esc(rawName)}"></div>
     <div class="field"><label>任务要求</label><input id="f_req" value="${esc(p.requirement)}" placeholder="具体要求、备注等"></div>
     <div class="field"><label>任务类型 <span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><div style="flex:1">${typePicker}</div><button class="btn sm ghost" id="f_editType" type="button">编辑类型</button></div></div>
     <div class="field"><label>项目 <span class="req">*</span></label><select id="f_project"><option value="">— 请选择项目</option>${projOpts}</select></div>
@@ -1928,9 +2143,9 @@ function openQuickPreview(text, preset){
     if(!projectExists(project)){ state.projectOrder.push(project); }
     const b = baseNameOf(name);
     const v = nextVersionFor(b);
-    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId,version:v,feedback:$m('#f_fb').value,difficulty:$m('#f_diff').value,owner:$m('#f_owner').value,status:'未完成',createdAt:nowISO(),updatedAt:nowISO()};
+    const task={id:uid(),name:name,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId,version:v,feedback:$m('#f_fb').value,difficulty:$m('#f_diff').value,owner:$m('#f_owner').value,status:'未开始',createdAt:nowISO(),updatedAt:nowISO()};
     state.tasks.push(task);
-    addLog('add', task.id, `新增任务《${b}》${relId?'(子任务)':'(主任务)'}`);
+    addLog('add', 'task', task.id, `《${name}》`, project, snapshotFields(task, ADD_SNAPSHOT_FIELDS), `新增任务《${name}》${relId?'(子任务)':'(主任务)'}`);
     save(); closeModal(); render();
   });
 }
@@ -2022,7 +2237,7 @@ function parseBatch(text, refDate){
       .replace(/[，,、。.．:：\s]+/g,' ').trim();
     if(!name) name = raw.slice(0,30);
     const type = detectType(name && name.length ? name : raw);
-    tasks.push({ project, type, name, requirement:'', start, due, status:'未完成', projUncertain, dueUncertain: !due });
+    tasks.push({ project, type, name, requirement:'', start, due, status:'未开始', projUncertain, dueUncertain: !due });
   }
   return tasks;
 }
@@ -2126,12 +2341,12 @@ function confirmBatch(){
     else if(project==='待定'){ if(!projectExists('待定')) state.projectOrder.push('待定'); }
     const b=baseNameOf(name);
     const v=nextVersionFor(b);
-    const task={id:uid(),name:b,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId||'',version:v,feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:status||'未完成',createdAt:nowISO(),updatedAt:nowISO()};
+    const task={id:uid(),name:name,requirement,type,project,start,due,actual:'',progress:0,deliverable:'',related:relId||'',version:v,feedback:'',difficulty:'',owner:OWNER_DEFAULT,status:status||'未开始',createdAt:nowISO(),updatedAt:nowISO()};
     state.tasks.push(task);
-    addLog('add', task.id, `批量录入·新增任务《${b}》${relId?'(子任务)':''}${project?('（'+project+'）'):''}`);
+    addLog('add', 'task', task.id, `《${name}》`, project, snapshotFields(task, ADD_SNAPSHOT_FIELDS), `批量录入·新增任务《${name}》${relId?'(子任务)':''}${project?('（'+project+'）'):''}`);
     n++;
   });
-  addLog('batch','',`批量录入 ${n} 条任务`);
+  addLog('batch', 'report', '', '', '', [], `批量录入 ${n} 条任务`);
   save(); closeModal();
   alert(`已批量保存 ${n} 条任务${skipped?`（跳过 ${skipped} 条空内容）`:''}，工作日志已记录。`);
   go(route);
@@ -2239,7 +2454,7 @@ function renderRoadmap(){
     const cards = state.projectOrder.map(p=>{
       const ts=state.tasks.filter(t=>t.project===p);
       const done=ts.filter(t=>t.status==='已交付').length;
-      const doing=ts.filter(t=>t.status==='正在进行').length;
+      const doing=ts.filter(t=>t.status==='进行中').length;
       const avg=ts.length?Math.round(ts.reduce((s,t)=>s+(+t.progress||0),0)/ts.length):0;
       return `<div class="proj-card" data-p="${esc(p)}">
         <div class="pc-top"><span class="pc-name">${esc(p)}</span><span class="pc-num">${ts.length}</span></div>
@@ -2263,7 +2478,7 @@ function renderRoadmap(){
     <span class="fl">状态：</span><select id="f_status">${['all',...STATUSES].map(x=>`<option ${state.filters.status===x?'selected':''}>${x}</option>`).join('')}</select>
     <span class="fl">起始日期：</span><input type="date" id="f_start" value="${esc(state.filters.startFrom)}">
     <span class="fl">预计交付截止于：</span><input type="date" id="f_due" value="${esc(state.filters.dueBefore)}">
-    <span class="legend-wrap"><span class="fl">图例：</span><span class="legend-item"><span class="dot d-已交付"></span>已交付</span><span class="legend-item"><span class="dot d-正在进行"></span>进行中</span><span class="legend-item"><span class="dot d-未完成"></span>未开始</span></span>
+    <span class="legend-wrap"><span class="fl">图例：</span><span class="legend-item"><span class="dot d-已交付"></span>已交付</span><span class="legend-item"><span class="dot d-进行中"></span>进行中</span><span class="legend-item"><span class="dot d-未开始"></span>未开始</span></span>
   </div>`;
   const tabs = `<div class="tabs">
     <button id="vb" class="${state.roadmapView==='board'?'on':''}">表格看板</button>
@@ -2276,7 +2491,7 @@ function renderRoadmap(){
     const baseIds = new Set(base.map(t=>t.id));
     const byParent = {};
     base.forEach(t=>{ const k=(t.related && baseIds.has(t.related))?t.related:''; (byParent[k]=byParent[k]||[]).push(t); });
-    Object.values(byParent).forEach(arr=>arr.sort((a,b)=> (a.start||'').localeCompare(b.start||'') * (state.roadmapSort==='asc'?1:-1)));
+    Object.values(byParent).forEach(arr=>arr.sort((a,b)=> (verNumOf(a.version)-verNumOf(b.version)) || (a.start||'').localeCompare(b.start||'') * (state.roadmapSort==='asc'?1:-1)));
     const rows=[];
     const renderNode=(t,depth)=>{
       const kids=(byParent[t.id]||[]);
@@ -2581,13 +2796,13 @@ function openEdit(id){
     <div class="field"><label>起始时间 *</label><div style="display:flex;gap:8px"><input id="e_start" type="date" value="${esc(t.start)}" style="flex:1"><button class="btn sm ghost today-btn" data-target="e_start" data-fill="today">当日</button></div></div>
     <div class="field"><label>预计交付日期 *</label><div style="display:flex;gap:8px"><input id="e_due" type="date" value="${esc(t.due)}" style="flex:1"><button class="btn sm ghost today-btn" data-target="e_start" data-fill="ref">当日</button></div></div>
     <div class="field"><label>实际交付日期</label><div style="display:flex;gap:8px"><input id="e_actual" type="date" value="${esc(t.actual)}" style="flex:1"><button class="btn sm ghost today-btn" data-target="e_start" data-fill="ref">当日</button></div></div>
-    <div class="field"><label>整体进度</label><input id="e_prog" type="number" min="0" max="100" value="${t.progress||0}"></div>
+    <div class="field"><label>整体进度</label><div style="display:flex;gap:6px;align-items:center"><input id="e_prog" type="number" min="0" max="100" value="${t.progress||0}" style="flex:1"><button class="btn sm ghost prog-preset" data-val="25">25</button><button class="btn sm ghost prog-preset" data-val="50">50</button><button class="btn sm ghost prog-preset" data-val="75">75</button><button class="btn sm ghost prog-preset" data-val="100">100</button></div></div>
     <div class="field"><label>交付成果</label><input id="e_del" value="${esc(t.deliverable)}"></div>
     <div class="field"><label>版本号</label><input id="e_ver" value="${esc(t.version)}" placeholder="如 v1 / v2"></div>
     <div class="field"><label>主任务（仅同项目可选）</label><select id="e_rel"><option value="">—（本身是主任务）</option>${relOpts}</select></div>
     ${isParentTask(t)?`<div class="hint" style="margin-top:-4px">该母任务有 ${childTasksOf(t.id).length} 个子任务，看板进度自动取平均；修改项目时子任务会同步跟随。</div>`:''}
-    <div class="field"><label>反馈意见</label><input id="e_fb" value="${esc(t.feedback)}" placeholder="子任务相对主任务的反馈 / 修订意见"></div>
-    <div class="field"><label>难点和动作</label><input id="e_diff" value="${esc(t.difficulty)}"></div>
+    <div class="field"><label>反馈意见</label><textarea id="e_fb" class="auto-resize" rows="2" placeholder="子任务相对主任务的反馈 / 修订意见">${esc(t.feedback)}</textarea></div>
+    <div class="field"><label>难点和动作</label><textarea id="e_diff" class="auto-resize" rows="2">${esc(t.difficulty)}</textarea></div>
     <div class="field"><label>负责人</label><input id="e_owner" value="${esc(t.owner)}"></div>
     <div class="field"><label>状态</label><select id="e_status">${STATUSES.map(s=>`<option ${s===t.status?'selected':''}>${s}</option>`).join('')}</select></div>
     <div style="text-align:right">
@@ -2596,15 +2811,24 @@ function openEdit(id){
       <button class="btn ok sm" id="eSave">保存</button>
     </div>`;
   openModal(html);
+  document.querySelectorAll('.prog-preset').forEach(btn=>btn.addEventListener('click',()=>{ $('#e_prog').value=btn.dataset.val; }));
+  /* textarea 自适应高度 */
+  document.querySelectorAll('.auto-resize').forEach(el=>{
+    const resize = ()=>{ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; };
+    el.addEventListener('input', resize);
+    resize();
+  });
   $('#eCancel').addEventListener('click',closeModal);
   $('#eDel').addEventListener('click',()=>deleteTaskWithChildren(id));
   $('#eSave').addEventListener('click',()=>{
+    const before = {...t};
     Object.assign(t,{name:$('#e_name').value.trim(),requirement:$('#e_req').value.trim(),type:$('#e_type').value,project:$('#e_project').value,start:$('#e_start').value,due:$('#e_due').value,actual:$('#e_actual').value,progress:+$('#e_prog').value,deliverable:$('#e_del').value,related:$('#e_rel').value,version:$('#e_ver').value,feedback:$('#e_fb').value,difficulty:$('#e_diff').value,owner:$('#e_owner').value,status:$('#e_status').value,updatedAt:nowISO()});
     /* 子任务跟随母任务项目；母任务改项目时子任务同步跟随，保证树在同一看板内 */
     if(t.related){ const par=parentOf(t); if(par && par.project) t.project=par.project; }
     childTasksOf(t.id).forEach(c=>{ c.project=t.project; });
     if(!projectExists(t.project)) state.projectOrder.push(t.project);
-    addLog('update', t.id, `修改任务《${t.name}》`);
+    const changes = diffTask(before, t);
+    addLog('update', 'task', t.id, `《${t.name}》`, t.project, changes, `修改任务《${t.name}》`);
     save(); closeModal(); render();
   });
 }
@@ -2614,7 +2838,7 @@ function deleteTaskWithChildren(id){
   const t=state.tasks.find(x=>x.id===id); if(!t) return;
   const kids=childTasksOf(id);
   if(!kids.length){
-    if(confirm('确认删除任务《'+t.name+'》？')){ state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete',id,`删除任务《${t.name}》`); save(); closeModal(); render(); }
+    if(confirm('确认删除任务《'+t.name+'》？')){ state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete','task',id,`《${t.name}》`,t.project,[],`删除任务《${t.name}》`); save(); closeModal(); render(); }
     return;
   }
   const items=kids.map(c=>`<label class="chk"><input type="checkbox" class="delkid" value="${c.id}"> ${esc(c.name)} <span class="muted">（${esc(c.project)} · ${esc(c.status)}）</span></label>`).join('');
@@ -2628,13 +2852,13 @@ function deleteTaskWithChildren(id){
     </div>`;
   openModal(html);
   $('#dtCancel').addEventListener('click',closeModal);
-  $('#dtKeep').addEventListener('click',()=>{ promoteKids(kids.map(c=>c.id)); state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete',id,`删除母任务《${t.name}》（${kids.length} 子任务提升为独立）`); save(); closeModal(); render(); });
+  $('#dtKeep').addEventListener('click',()=>{ promoteKids(kids.map(c=>c.id)); state.tasks=state.tasks.filter(x=>x.id!==id); addLog('delete','task',id,`《${t.name}》`,t.project,[],`删除母任务《${t.name}》（${kids.length} 子任务提升为独立）`); save(); closeModal(); render(); });
   $('#dtDel').addEventListener('click',()=>{
     const delIds=[...document.querySelectorAll('.delkid:checked')].map(c=>c.value);
     const keepIds=kids.map(c=>c.id).filter(x=>!delIds.includes(x));
     promoteKids(keepIds);
     state.tasks=state.tasks.filter(x=>x.id!==id && !delIds.includes(x.id));
-    addLog('delete',id,`删除母任务《${t.name}》${delIds.length?` + ${delIds.length} 子任务`:''}`);
+    addLog('delete','task',id,`《${t.name}》`,t.project,[],`删除母任务《${t.name}》${delIds.length?` + ${delIds.length} 子任务`:''}`);
     save(); closeModal(); render();
   });
 }
@@ -2668,7 +2892,7 @@ function renderFiles(){
     $('#fbody').querySelectorAll('[data-fedit]').forEach(b=>b.addEventListener('click',()=>openFileEdit(b.dataset.fedit)));
     $('#fbody').querySelectorAll('[data-fdel]').forEach(b=>b.addEventListener('click',()=>{
       const f=state.files.find(x=>x.id===b.dataset.fdel); if(!f) return;
-      if(confirm('确认删除文件《'+f.name+'》？')){ state.files=state.files.filter(x=>x.id!==b.dataset.fdel); addLog('delete',null,`删除文件《${f.name}》`); save(); draw(); }
+      if(confirm('确认删除文件《'+f.name+'》？')){ state.files=state.files.filter(x=>x.id!==b.dataset.fdel); addLog('delete','file',f.id,`《${f.name}》`,f.project||'',[],`删除文件《${f.name}》`); save(); draw(); }
     }));
   };
   draw();
@@ -2724,7 +2948,7 @@ function openFilePreview(text){
     if(!name||!project||!type||!uploaded){ alert('必填：文件名、项目、文件类型、上传日期'); return; }
     state.files.push({id:uid(),name,url,project,type,uploaded,note:$('#f_note').value,createdAt:nowISO()});
     if(project && !projectExists(project)) state.projectOrder.push(project);
-    addLog('file', null, `上传文件《${name}》${project?('（'+project+'）'):''}`);
+    addLog('file', 'file', '', `《${name}》`, project, snapshotFields({name,url,project,type,uploaded,note:note||''}, ['name','url','project','type','uploaded','note']), `上传文件《${name}》${project?('（'+project+'）'):''}`);
     save(); closeModal();
     alert('已上传文件，工作日志已记录。');
     renderFiles();
@@ -2754,9 +2978,11 @@ function openFileEdit(id){
     const type=$('#modalBg #f_type').value;
     const uploaded=$('#f_up').value;
     if(!name||!project||!type||!uploaded){ alert('必填：文件名、项目、文件类型、上传日期'); return; }
+    const before={...f};
     Object.assign(f,{name,url,project,type,uploaded,note:$('#f_note').value,updatedAt:nowISO()});
     if(project && !projectExists(project)) state.projectOrder.push(project);
-    addLog('update', null, `修改文件《${name}》`);
+    const changes=diffTask(before,f,['name','url','project','type','uploaded','note']);
+    addLog('update', 'file', f.id, `《${name}》`, f.project, changes, `修改文件《${name}》`);
     save(); closeModal();
     alert('已保存修改，工作日志已记录。');
     renderFiles();
@@ -2774,28 +3000,147 @@ function renderNotes(){
 }
 
 /* ============ 工作日志 ============ */
+/* 操作类型 → 图标/动词 */
+const LOG_ACTIONS = {
+  add:{icon:'➕', verb:'新增', cls:'log-add'},
+  update:{icon:'✏️', verb:'修改', cls:'log-upd'},
+  delete:{icon:'🗑', verb:'删除', cls:'log-del'},
+  file:{icon:'📎', verb:'文件', cls:'log-file'},
+  report:{icon:'📋', verb:'报告', cls:'log-rep'},
+  batch:{icon:'📦', verb:'批量', cls:'log-batch'}
+};
+/* 生成变更摘要短句（紧凑卡片用） */
+function logChangeSummary(changes){
+  if(!changes || !changes.length) return '';
+  const parts = changes.slice(0,3).map(c=>{
+    const label = LOG_FIELD_LABELS[c.field] || c.field;
+    const from = c.from===''? '（空）' : c.from;
+    const to = c.to===''? '（空）' : c.to;
+    return `${label}: ${from} → ${to}`;
+  });
+  let s = parts.join(' · ');
+  if(changes.length>3) s += ` · +${changes.length-3}项`;
+  return s;
+}
+/* 渲染单条日志的紧凑卡片 */
+function logCardHTML(l){
+  const act = LOG_ACTIONS[l.action] || {icon:'•',verb:l.action,cls:''};
+  const time = (l.ts||'').slice(11,16) || '';
+  const proj = l.projectName ? `📂 ${esc(l.projectName)}` : '';
+  const target = l.targetName ? esc(l.targetName) : '';
+  const summary = (l.changes && l.changes.length) ? logChangeSummary(l.changes) : (l.summary||'');
+  const linkable = (l.targetType==='task' && l.targetId) ? `data-logid="${l.id}"` : '';
+  return `<div class="log-card ${act.cls}" ${linkable}>
+    <div class="log-card-top">
+      <span class="log-ic">${act.icon}</span>
+      <span class="log-verb">${act.verb}</span>
+      <span class="log-time">${time}</span>
+    </div>
+    <div class="log-card-proj">${proj}${target?`<span class="log-target">${target}</span>`:''}</div>
+    ${summary?`<div class="log-card-sum">${esc(summary)}</div>`:''}
+  </div>`;
+}
+/* 概况页紧凑行：时间 + 图标 + 项目·任务 + 改了什么 */
+function logLineHTML(l){
+  const act = LOG_ACTIONS[l.action] || {icon:'•',verb:l.action,cls:''};
+  const time = (l.ts||'').slice(11,16) || '';
+  const ctx = [l.projectName?`[${esc(l.projectName)}]`:'', l.targetName?`${esc(l.targetName)}`:''].filter(Boolean).join(' ');
+  const summary = (l.changes && l.changes.length) ? logChangeSummary(l.changes) : (l.summary||'');
+  const extra = summary? ` — ${esc(summary)}` : '';
+  const linkable = (l.targetType==='task' && l.targetId) ? `data-logid="${l.id}"` : '';
+  return `<div class="ov-log-row" ${linkable}><span class="ov-log-time">${time}</span><span class="ov-log-ic">${act.icon}</span><span class="ov-log-ctx">${ctx}</span><span class="ov-log-sum">${extra}</span></div>`;
+}
+/* 单条变更行（前 → 后） */
+function diffRowHTML(c){
+  const label = LOG_FIELD_LABELS[c.field] || c.field;
+  const from = c.from===''? '<span class="empty">（空）</span>' : esc(c.from);
+  const to = c.to===''? '<span class="empty">（空）</span>' : esc(c.to);
+  return `<div class="diff-row"><span class="diff-field">${label}</span><span class="diff-from">${from}</span><span class="diff-arrow">→</span><span class="diff-to">${to}</span></div>`;
+}
+/* 单条当前值行（无前后对比时作兜底展示） */
+function kvRowHTML(c){
+  const label = LOG_FIELD_LABELS[c.field] || c.field;
+  return `<div class="kv-row"><span class="kv-k">${label}</span><span class="kv-v">${esc(c.to||'（空）')}</span></div>`;
+}
+/* 点击卡片 → 放大详情（飞书式双栏雏形：左时间轴 + 右详情） */
+function openLogDetail(l){
+  const act = LOG_ACTIONS[l.action] || {icon:'•',verb:l.action,cls:''};
+  let body = '';
+  if(l.changes && l.changes.length){
+    /* 新日志：直接展示「前 → 后」字段级对比 */
+    body = `<div class="log-diff">${l.changes.map(diffRowHTML).join('')}</div>`;
+  } else {
+    /* 兜底：更早版本创建的日志未记录字段级变更；若仍关联到现存任务，展示其当前信息 */
+    const t = (l.targetType==='task' && l.targetId) ? state.tasks.find(x=>x.id===l.targetId) : null;
+    if(t){
+      const ctx = snapshotFields(t, ADD_SNAPSHOT_FIELDS);
+      body = `<div class="log-note">该记录创建于更早版本，未记录字段级「前 → 后」变更；以下为该任务当前信息：</div>`+
+             `<div class="log-kv">${ctx.map(kvRowHTML).join('')}</div>`;
+    } else {
+      body = `<div class="log-sum-only">${esc(l.summary||'（无详细描述）')}</div>`;
+    }
+  }
+  const targetLink = (l.targetType==='task' && l.targetId && state.tasks.find(x=>x.id===l.targetId))
+    ? `<button class="btn sm ghost" id="logGoTask">前往该任务 →</button>` : '';
+  const html = `<h3>${act.icon} ${act.verb}记录</h3>
+    <div class="log-detail-meta">
+      <span class="muted">${esc(l.ts)}</span>
+      ${l.projectName?`<span class="pill">${esc(l.projectName)}</span>`:''}
+      ${l.targetName?`<span class="log-dt-name">${esc(l.targetName)}</span>`:''}
+    </div>
+    ${l.summary?`<div class="log-dt-sum">${esc(l.summary)}</div>`:''}
+    ${body}
+    <div style="text-align:right;margin-top:12px">
+      ${targetLink}
+      <button class="btn ghost sm" id="logClose">关闭</button>
+    </div>`;
+  openModal(html);
+  $('#logClose').addEventListener('click',closeModal);
+  const gt = $('#logGoTask');
+  if(gt) gt.addEventListener('click',()=>{ if(l.targetId) goToTask(l.targetId); });
+}
+
 function renderLogs(){
-  let html = `${pageHeader('05','工作日志','LOGS','按天记录 · 日报/周报素材')}
+  let html = `${pageHeader('05','工作日志','LOGS','操作留痕 · 全流程可追溯')}
     <div class="card" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="log-filters">
+        <button class="logf on" data-f="all">全部</button>
+        <button class="logf" data-f="add">新增</button>
+        <button class="logf" data-f="update">修改</button>
+        <button class="logf" data-f="delete">删除</button>
+        <button class="logf" data-f="file">文件</button>
+        <button class="logf" data-f="report">报告</button>
+      </div>
       <input type="date" id="ldate" style="border:1px solid var(--line);border-radius:8px;padding:6px">
       <input id="lkw" placeholder="关键词搜索" style="border:1px solid var(--line);border-radius:8px;padding:6px">
       <button class="btn ghost sm" id="lreset">显示全部</button>
     </div>
     <div class="card" id="logbody"></div>`;
   setMain(html);
+  let filterType = 'all';
   const draw = (date,kw)=>{
     let logs = state.logs.slice();
+    if(filterType!=='all') logs = logs.filter(x=>x.action===filterType);
     if(date) logs = logs.filter(x=>x.ts.startsWith(date));
-    if(kw) logs = logs.filter(x=>x.text.includes(kw));
+    if(kw) logs = logs.filter(x=> (x.summary||x.text||'').includes(kw) || (x.targetName||'').includes(kw) || (x.projectName||'').includes(kw));
     const groups = {};
     logs.forEach(x=>{ const day=x.ts.slice(0,10); (groups[day]=groups[day]||[]).push(x); });
     const keys = Object.keys(groups).sort().reverse();
-    $('#logbody').innerHTML = keys.length? keys.map(d=>`<div class="day-group"><div class="dh">${d}</div><ul class="tl">${groups[d].map(x=>`<li><span class="muted">${esc(x.ts.slice(11))}</span> · ${esc(x.text)}</li>`).join('')}</ul></div>`).join('') : '<p class="muted">无记录</p>';
+    $('#logbody').innerHTML = keys.length? keys.map(d=>`<div class="day-group"><div class="dh">${d}</div><div class="log-grid">${groups[d].map(logCardHTML).join('')}</div></div>`).join('') : '<p class="muted">无记录</p>';
+    $('#logbody').querySelectorAll('.log-card').forEach(c=>{
+      const id=c.dataset.logid;
+      if(id) c.addEventListener('click',()=>{ const l=state.logs.find(x=>x.id===id); if(l) openLogDetail(l); });
+    });
   };
   draw('','');
   $('#ldate').addEventListener('change',e=>draw(e.target.value,$('#lkw').value.trim()));
   $('#lkw').addEventListener('input',e=>draw($('#ldate').value,e.target.value.trim()));
   $('#lreset').addEventListener('click',()=>{ $('#ldate').value=''; $('#lkw').value=''; draw('',''); });
+  document.querySelectorAll('.logf').forEach(b=>b.addEventListener('click',()=>{
+    filterType=b.dataset.f;
+    document.querySelectorAll('.logf').forEach(x=>x.classList.toggle('on', x===b));
+    draw($('#ldate').value,$('#lkw').value.trim());
+  }));
 }
 
 /* ============ 报告生成（日报/周报/代办） ============ */
@@ -2806,11 +3151,23 @@ function reportBlock(r){
   const time = r.confirmedAt || '';
   const c = r.content || {};
   const section = (label, txt) => txt ? `<div class="rb-sec"><span class="rb-lab">${label}</span><div class="rb-txt">${esc(txt)}</div></div>` : '';
+  /* 代办：解析 JSON 左右分布展示 */
+  if(r.type==='todo'){
+    let td={today:'',week:''};
+    try{ td=JSON.parse(c.todo||'{}'); }catch(e){ td.today=c.todo||''; }
+    return `<div class="report-block">
+      <div class="report-head"><span class="report-tag">${esc(t)}</span><span class="report-time">${esc(time)} 生成</span></div>
+      <div style="display:flex;gap:16px">
+        <div style="flex:1">${section('📌 本日', td.today)}</div>
+        <div style="flex:1">${section('📅 本周', td.week)}</div>
+      </div>
+    </div>`;
+  }
   return `<div class="report-block">
     <div class="report-head"><span class="report-tag">${esc(t)}</span><span class="report-time">${esc(time)} 生成</span></div>
-    ${section('已完成', c.done)}
+    ${section('已交付', c.done)}
     ${section('进行中', c.doing)}
-    ${section('待发展', c.todo)}
+    ${section('未开始', c.todo)}
   </div>`;
 }
 function reportListHTML(){
@@ -2824,27 +3181,97 @@ function reportListHTML(){
 }
 function buildReport(type){
   const tasks = state.tasks;
-  const done = tasks.filter(t=>t.status==='已交付');
-  const doing = tasks.filter(t=>t.status==='正在进行');
-  const todo = tasks.filter(t=>t.status==='未完成');
+  const today = todayStr();
+  const wr = weekRange();
   const bullets = arr => arr.length? arr.map(t=>`• ${t.name}（${t.project}）`).join('\n') : '• （无）';
-  if(type==='daily') return {
-    done: bullets(done), doing: bullets(doing), todo: bullets(todo)
+
+  if(type==='daily'){
+    /* 日报标准：
+       已交付：实际交付日期=今天 且 状态=已交付
+       进行中：今天介于起始~预计交付之间 且 状态=进行中
+       未开始：起始日期<今天 且 状态=未开始
+    */
+    const done = tasks.filter(t=> t.status==='已交付' && t.actual===today);
+    const doing = tasks.filter(t=> t.status==='进行中' && t.start && t.due && t.start<=today && today<=t.due);
+    const undone = tasks.filter(t=> t.status==='未开始' && t.start && t.start<today);
+    return { done: bullets(done), doing: bullets(doing), todo: bullets(undone) };
+  }
+
+  if(type==='weekly'){
+    /* 周报标准：
+       已交付：实际交付日期在本周任意一天 且 状态=已交付
+       进行中：周五日期介于起始~预计交付之间 且 状态=进行中
+       未开始：状态=未开始
+    */
+    const done = tasks.filter(t=> t.status==='已交付' && t.actual && inWeek(t.actual));
+    /* 周五日期 */
+    const friDate = (()=>{ const d=new Date(wr.end); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+    const doing = tasks.filter(t=> t.status==='进行中' && t.start && t.due && t.start<=friDate && friDate<=t.due);
+    const undone = tasks.filter(t=> t.status==='未开始');
+    return { done: bullets(done), doing: bullets(doing), todo: bullets(undone) };
+  }
+
+  /* 代办标准：
+     分本日 / 本周两部分，左右分布
+     本日：实际交付日期=今天 且 状态=进行中或未开始
+     本周：实际交付日期从今天到最近周五（含）且 状态=进行中或未开始
+  */
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=周日
+  const daysToFri = dayOfWeek===0? 6 : (5-dayOfWeek); // 距离周五的天数
+  const friOfThisWeek = new Date(now); friOfThisWeek.setDate(now.getDate()+daysToFri);
+  const p=n=>String(n).padStart(2,'0');
+  const fmtD=d=>`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const thisFri = fmtD(friOfThisWeek);
+
+  const todayTasks = tasks.filter(t=> (t.status==='进行中'||t.status==='未开始') && t.actual===today );
+  const weekTasks = tasks.filter(t=> (t.status==='进行中'||t.status==='未开始') && t.actual && t.actual>=today && t.actual<=thisFri );
+
+  const bulletDetail = arr => arr.length? arr.map(t=>`• ${fmt(t.actual||t.due)} · ${t.name}（${t.project}）`).join('\n') : '• （无）';
+  return {
+    done:'', doing:'',
+    todo: JSON.stringify({today:bulletDetail(todayTasks),week:bulletDetail(weekTasks)}),
+    _raw: {today:todayTasks,week:weekTasks}
   };
-  if(type==='weekly') return {
-    done: bullets(done), doing: bullets(doing), todo: bullets(todo)
-  };
-  // todo：未完成任务的预期交付
-  const lines = todo.length? todo.map(t=>`• ${fmt(t.due)} 前交付：${t.name}（${t.project}）`).join('\n') : '• （无待交付）';
-  return { done:'', doing:'', todo: lines };
 }
 function openReport(type){
   const c = buildReport(type);
   const titleMap = {daily:'生成日报',weekly:'生成周报',todo:'生成代办'};
+
+  if(type==='todo'){
+    /* 代办：本日 / 本周 左右分布 */
+    let todoData;
+    try{ todoData = JSON.parse(c.todo); } catch(e){ todoData={today:c.todo,week:''}; }
+    const html = `<h3>${titleMap[type]}（可编辑，确认后展示在概况）</h3>
+      <div class="todo-split">
+        <div class="todo-col">
+          <label class="todo-label">📌 本日待办</label>
+          <textarea class="edit" id="r_todo_today" rows="6">${esc(todoData.today)}</textarea>
+        </div>
+        <div class="todo-col">
+          <label class="todo-label">📅 本周待办</label>
+          <textarea class="edit" id="r_todo_week" rows="6">${esc(todoData.week)}</textarea>
+        </div>
+      </div>
+      <div style="text-align:right"><button class="btn ghost sm" id="rc">取消</button><button class="btn ok sm" id="rk">确认生成</button></div>`;
+    openModal(html, true);
+    $('#rc').addEventListener('click',closeModal);
+    $('#rk').addEventListener('click',()=>{
+      const content = {done:'',doing:'',todo:JSON.stringify({today:$('#r_todo_today').value,week:$('#r_todo_week').value})};
+      const exist = state.reports.find(r=>r.type===type);
+      if(exist){ Object.assign(exist,{content,status:'confirmed',confirmedAt:nowISO()}); }
+      else state.reports.push({id:uid(),type,content,status:'confirmed',confirmedAt:nowISO()});
+      addLog('report', 'report', '', `《${titleMap[type]}》`, '', [], `生成并确认《${titleMap[type]}》`);
+      save(); closeModal(); go('overview');
+    });
+    return;
+  }
+
+  /* 日报 / 周报：三栏布局 */
   const html = `<h3>${titleMap[type]}（可编辑，确认后展示在概况）</h3>
-    <div class="field"><label>已完成</label><textarea class="edit" id="r_done" rows="4">${esc(c.done)}</textarea></div>
-    <div class="field"><label>正在进行</label><textarea class="edit" id="r_doing" rows="4">${esc(c.doing)}</textarea></div>
-    <div class="field"><label>待发展</label><textarea class="edit" id="r_todo" rows="4">${esc(c.todo)}</textarea></div>
+    <div class="field"><label>已交付</label><textarea class="edit" id="r_done" rows="4">${esc(c.done)}</textarea></div>
+    <div class="field"><label>进行中</label><textarea class="edit" id="r_doing" rows="4">${esc(c.doing)}</textarea></div>
+    <div class="field"><label>未开始</label><textarea class="edit" id="r_todo" rows="4">${esc(c.todo)}</textarea></div>
     <div style="text-align:right"><button class="btn ghost sm" id="rc">取消</button><button class="btn ok sm" id="rk">确认生成</button></div>`;
   openModal(html);
   $('#rc').addEventListener('click',closeModal);
@@ -2854,7 +3281,7 @@ function openReport(type){
     const exist = state.reports.find(r=>r.type===type);
     if(exist){ Object.assign(exist,{content,status:'confirmed',confirmedAt:nowISO()}); }
     else state.reports.push({id:uid(),type,content,status:'confirmed',confirmedAt:nowISO()});
-    addLog('report', '', `生成并确认《${titleMap[type]}》`);
+    addLog('report', 'report', '', `《${titleMap[type]}》`, '', [], `生成并确认《${titleMap[type]}》`);
     save(); closeModal(); go('overview');
   });
 }
@@ -2862,6 +3289,37 @@ function openReport(type){
 /* ============ Modal ============ */
 function openModal(html, wide){ $('#modal').innerHTML=html; $('#modal').classList.toggle('wide', !!wide); $('#modalBg').classList.add('show'); }
 function closeModal(){ $('#modalBg').classList.remove('show'); $('#modal').classList.remove('wide'); }
+/* 跳转后高亮目标任务条（闪烁两次，辅助定位） */
+function highlightTaskRow(id){
+  const find = ()=> document.querySelector(`#main tr[data-id="${id}"]`);
+  let row = find();
+  if(!row){
+    /* 子任务可能处于折叠状态，展开其全部祖先后重试 */
+    const t = state.tasks.find(x=>x.id===id);
+    if(t){
+      let cur=t, changed=false;
+      while(cur && cur.related){
+        if(!state.expandedParents.includes(cur.related)){ state.expandedParents.push(cur.related); changed=true; }
+        cur = state.tasks.find(x=>x.id===cur.related);
+      }
+      if(changed){ save(); render(); row = find(); }
+    }
+  }
+  if(!row) return;
+  row.scrollIntoView({block:'center', behavior:'smooth'});
+  row.classList.remove('flash');
+  void row.offsetWidth; /* 重置动画以便重复触发 */
+  row.classList.add('flash');
+  row.addEventListener('animationend', ()=>row.classList.remove('flash'), {once:true});
+}
+/* 统一跳转：关闭弹窗 → 进入项目看板 → 闪烁定位目标任务条 */
+function goToTask(taskId){
+  const t = state.tasks.find(x=>x.id===taskId);
+  if(!t) return;
+  closeModal();
+  go('roadmap', t.project);
+  highlightTaskRow(taskId);
+}
 /* ============ 编辑任务类型（全局增删改，不在单任务编辑内） ============ */
 function openTypeEditor(){
   const draw = ()=> getTypes().map((tp,i)=>`
