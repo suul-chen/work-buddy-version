@@ -4,7 +4,7 @@
 
 ## 在线访问
 
-**点击进入应用**：https://suul-chen.github.io/work-buddy-version/work-buddy-version.html
+**点击进入应用（v6.5）**：https://suul-chen.github.io/work-buddy-version/work-buddy-version.html
 
 
 ---
