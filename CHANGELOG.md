@@ -8,6 +8,24 @@
 > **版本命名规则**：每次部署版本号递增（v1 → v2 → v3 → v4 → v5 …），
 > 同步生成 `v{N}.html` 历史快照 + Git Tag `v{N}` + GitHub Release。
 
+## v7 · 2026-08-03 — №04 碎碎念双栏 + 本地优先 AI 求职教练
+
+- **来源**：`v7.html`（№04 碎碎念双栏改造 + AI 求职教练）；`work-buddy-version.html` 同步覆盖为 v7
+- **文件指纹**：MD5 `1562d0de6d68847ff73e7e17f1b8b5ae` · 195,900 bytes（`v7.html`）
+- **变更摘要**：
+  - ✅ **№04 碎碎念双栏改造**：左栏保留原随笔（不进日报），右栏新增「🤖 AI 小助手」对话区
+  - ✅ **AI 求职教练（BYOK + 透明 CORS 中继）**：用户自粘 DeepSeek Key（存本地），经一层极薄 Cloudflare Worker 中继调用模型，完整读取工作台后主动梳理卡点 / 给下一步建议 / 模拟面试
+  - ✅ **上下文蒸馏 `buildContextPack()`**：仅在发消息时把 `state` 蒸馏成结构化摘要（停滞任务 / 临近截止 / feedback 难点 / 碎碎念情绪线索 / 最近操作）喂给模型，而非裸丢全量数据
+  - ✅ **快捷提问 + SSE 流式**：梳理卡点 / 下一步建议 / 模拟面试 一键触发；`stream:true` + SSE 解析，打字机效果
+  - ✅ **⚙ AI 设置入口**：导航底部新增「AI 设置」，可填 Key / 中继地址 / 模型 / 是否包含碎碎念全文
+  - ✅ **AI 记忆独立持久化（核心约束）**：AI 配置与对话走独立 `localStorage` 键（`campus_workbench_ai` / `campus_workbench_ai_chat`），与 `state` 完全解耦——版本升级天然不丢；导出备份剔除 Key、仅迁移对话记忆，安全可控
+  - 🔧 **CORS 中继一键部署**：新增 `项目资产/ai-proxy.js`（Cloudflare Worker 完整可部署脚本），免费 `workers.dev` 即可跑通
+  - 🔧 **向后兼容**：`state` / `normalize()` / `seed()` 未改动，旧用户升级无感；无 Key 时 AI 区显示设置引导、不报错
+- **部署方式**：PAT + GitHub Contents API 推送至 `suul-chen/work-buddy-version`（main）→ GitHub Pages
+- **状态**：✅ 已上线
+- **详细总结**：见 [v7更新日志.md](./v7更新日志.md)
+
+---
 ## v6.5 · 2026-07-29 — Phase 4 体验打磨补丁（v6 之上）
 
 - **来源**：`v6.5.html`（v6 之上的体验打磨补丁线）；`work-buddy-version.html` 同步覆盖为 v6.5
@@ -154,4 +172,4 @@
 5. 打 Tag `v{N}` + 创建 GitHub Release（作为平台级"更新信息"留存）。
 6. 验证 `https://suul-chen.github.io/work-buddy-version/` 返回 200。
 
-> 下一个版本号：**v6.6**
+> 下一个版本号：**v6.7**
