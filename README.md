@@ -4,7 +4,7 @@
 
 ## 在线访问
 
-**点击进入应用（v6.5）**：https://suul-chen.github.io/work-buddy-version/work-buddy-version.html
+**点击进入应用（v7）**：https://suul-chen.github.io/work-buddy-version/work-buddy-version.html
 
 
 ---
@@ -71,9 +71,12 @@ Work Buddy 以左侧导航的五大模块组织全部功能，从录入、管理
 - **表格直达**：文件名带链接时蓝色可点击 ↗，新标签页直接打开飞书在线预览 / 下载。
 - **筛选**：按项目 / 类型 / 日期过滤交付物。
 
-### №04 碎碎念 · 自由记录
+### №04 碎碎念 · 自由记录 + 🤖 AI 求职教练
 
-- 随手记录工作感悟，按日期归档，作为非正式随笔，**不进入日报**，保留最真实的思考片段。
+- **左栏随笔**：随手记录工作感悟，按日期归档，作为非正式随笔，**不进入日报**，保留最真实的思考片段。
+- **右栏 🤖 AI 小助手**：本地优先、隐私可控的 **AI 求职教练**（BYOK 模式——用户自粘 DeepSeek Key，存本地；经一层极薄 Cloudflare Worker 透明 CORS 中继调用模型）。完整读取工作台后主动**梳理卡点 / 给下一步建议 / 模拟面试**；支持「梳理卡点 / 下一步建议 / 模拟面试」快捷提问、SSE 流式打字机输出；⚙ 导航底部「AI 设置」可填 Key / 中继地址 / 模型 / 是否包含碎碎念全文。
+- **上下文蒸馏 `buildContextPack()`**：只在发消息时把 `state` 蒸馏成结构化摘要（停滞任务 / 临近截止 / feedback 难点 / 碎碎念情绪线索 / 最近操作）喂给模型，而非裸丢全量数据。
+- **AI 记忆独立持久化**：AI 配置与对话走**独立 `localStorage` 键**（`campus_workbench_ai` 配置 / `campus_workbench_ai_chat` 对话），与 `state` 完全解耦——版本升级天然不丢；导出备份**剔除 Key、仅迁移对话记忆**，安全可控；无 Key 时 AI 区显示设置引导、不报错。
 
 ### №05 工作日志 · 操作留痕
 
@@ -87,15 +90,18 @@ Work Buddy 以左侧导航的五大模块组织全部功能，从录入、管理
 |------|------|
 | **形态** | 单文件纯静态 HTML + CSS + 原生 JS（无构建、无后端） |
 | **路由** | `go(route,project)` + `setMain(html)` SPA 路由 |
-| **持久化** | 浏览器 `localStorage`（键 `campus_workbench_v1`） |
+| **持久化** | 浏览器 `localStorage`（主数据键 `campus_workbench_v1`） |
+| **AI 记忆** | 独立 `localStorage` 键（`campus_workbench_ai` 配置 / `campus_workbench_ai_chat` 对话），与 `state` 解耦；BYOK + 透明 CORS 中继调用 DeepSeek |
 | **部署** | GitHub Pages（`suul-chen/work-buddy-version` → `main` 分支根目录） |
 | **设计风格** | 柔和工作台风（暖米底 `#efeae0` + 强红强调 `#e63946` 基础上，统一圆角卡片 / 胶囊按钮 / 轻阴影；编号页眉 №01~№05、view-enter 入场动画保留） |
+
+> **AI 教练说明（v7）**：AI 能力为 BYOK（Bring Your Own Key），谁用谁自带 DeepSeek Key 与可信任的中继地址，工作台本身零成本、零账号系统；每个人的 Key / 对话 / 工作台数据均只存在自己浏览器的 `localStorage`，互不可见。CORS 中继（`项目资产/ai-proxy.js`）为独立部署物，不写进 HTML。详见 [v7更新日志.md](./v7更新日志.md)。
 
 ---
 
 ## 版本历史
 
-当前版本 **v6.5**（2026-07-29）：v6 之上的体验打磨补丁——版本号排序、进度快捷按钮、状态术语统一（未开始 / 进行中 / 已交付）、textarea 自适应、任务名 vN 误删修复、指标卡详情弹窗、跳转闪烁定位、日志留痕补全与旧记录兜底。完整跨版本变更见 [CHANGELOG.md](./CHANGELOG.md)；v5.5 / v6 / v6.5 阶段细节分别见 [v5.5更新日志.md](./v5.5更新日志.md) / [v6更新日志.md](./v6更新日志.md) / [v6.5更新日志.md](./v6.5更新日志.md)。
+当前版本 **v7**（2026-08-03）：在 №04 碎碎念页落地**本地优先、隐私可控的 AI 求职教练**——碎碎念双栏改造（左随笔 + 右 🤖 AI 小助手）、BYOK + 透明 CORS 中继（Cloudflare Worker）、`buildContextPack()` 上下文蒸馏、快捷提问、SSE 流式、⚙ AI 设置入口，以及核心约束「AI 记忆独立持久化」（独立键与 `state` 解耦，版本升级天然不丢）。完整跨版本变更见 [CHANGELOG.md](./CHANGELOG.md)；v5.5 / v6 / v6.5 / v7 阶段细节分别见 [v5.5更新日志.md](./v5.5更新日志.md) / [v6更新日志.md](./v6更新日志.md) / [v6.5更新日志.md](./v6.5更新日志.md) / [v7更新日志.md](./v7更新日志.md)。
 
 ---
 
@@ -111,7 +117,8 @@ work-buddy-version/
 ├── v5.html                 # v5 历史快照（Phase 4 母任务/子任务 + bug 修复）
 ├── v5.5.html               # v5.5 历史快照（v6 合并前功能基线）
 ├── v6.html                 # v6 历史快照（Codex UI + 数据导入导出 + 甘特优化）
-├── v6.5.html               # v6.5 历史快照（当前最新，体验打磨补丁）
+├── v6.5.html               # v6.5 历史快照（体验打磨补丁）
+├── v7.html                 # v7 历史快照（№04 碎碎念双栏 + AI 求职教练）
 ├── CHANGELOG.md            # 更新日志
 ├── README.md               # 本文件
 ├── v3更新日志.md            # v3 阶段更新日志
@@ -119,7 +126,8 @@ work-buddy-version/
 ├── v5更新日志.md            # v5 阶段更新日志
 ├── v5.5更新日志.md          # v5.5 阶段更新日志
 ├── v6更新日志.md            # v6 阶段更新日志
-└── v6.5更新日志.md          # v6.5 阶段更新日志
+├── v6.5更新日志.md          # v6.5 阶段更新日志
+└── v7更新日志.md            # v7 阶段更新日志
 ```
 
 > 版本策略：`work-buddy-version.html` 始终指向最新版；`vN.html` 为各版本永久快照，发布新版本时新增而不删除。
