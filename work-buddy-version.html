@@ -114,7 +114,7 @@ ul.tl li .ts{color:var(--sub);font-size:11px;min-width:110px;font-weight:800;let
 
 /* filter bar */
 .filterbar{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;background:#fff;border:2px solid var(--ink);padding:16px 16px 16px 110px;margin-bottom:16px;position:relative}
-.filterbar::before{name:'FILTERS';position:absolute;top:-2px;left:-2px;background:var(--ink);color:#fff;font-size:10px;letter-spacing:3px;padding:6px 10px;font-weight:800}
+.filterbar::before{content:'FILTERS';position:absolute;top:-2px;left:-2px;background:var(--ink);color:#fff;font-size:10px;letter-spacing:3px;padding:6px 10px;font-weight:800}
 .filterbar .fl{font-size:10px;letter-spacing:2px;font-weight:800;color:var(--sub);text-transform:uppercase;display:flex;align-items:center;gap:6px}
 .filterbar select,.filterbar input[type=date]{border:2px solid var(--ink);padding:6px 10px;font-size:12px;font-family:inherit;background:#fff;border-radius:0}
 .filterbar .sortbtn{cursor:pointer;border:2px solid var(--ink);padding:6px 12px;background:#fff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;transition:all .15s;font-family:inherit}
@@ -219,7 +219,7 @@ textarea.edit{width:100%;border:2px solid var(--ink);padding:10px;font-family:in
 /* misc */
 .day-group{margin-bottom:18px;border-left:3px solid var(--ink);padding:6px 0 6px 14px;background:#fff}
 .day-group .dh{font-weight:900;font-size:13px;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:8px;text-transform:uppercase}
-.day-group .dh::before{name:'◆';color:var(--accent);font-size:14px}
+.day-group .dh::before{content:'◆';color:var(--accent);font-size:14px}
 .ov-todo li b{color:var(--accent)}
 .deco{display:flex;align-items:center;gap:10px;margin:10px 0 16px;color:var(--sub);font-size:11px;letter-spacing:3px;font-weight:800;text-transform:uppercase}
 .deco::before,.deco::after{content:'';flex:1;border-top:2px solid var(--ink)}
@@ -1443,6 +1443,30 @@ body{
   color:#fff!important;
 }
 
+
+/* ============ v7 碎碎念 AI 助手 ============ */
+.notes-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+@media (max-width:820px){ .notes-grid{ grid-template-columns:1fr; } }
+.ai-card{ border-left:3px solid var(--accent); }
+.ai-empty{ color:var(--sub); font-size:13px; line-height:1.6; }
+.ai-quick{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.chip{ background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  border-radius:999px; padding:5px 12px; font-size:12px; cursor:pointer; font-family:inherit; }
+.chip:hover{ border-color:var(--accent); color:var(--accent); }
+.ai-msgs{ max-height:320px; overflow:auto; display:flex; flex-direction:column; gap:10px; padding:4px 2px; }
+.ai-row{ font-size:13px; line-height:1.6; padding:8px 10px; border-radius:10px; white-space:pre-wrap; word-break:break-word; }
+.ai-row.user{ background:var(--bg); align-self:flex-end; max-width:88%; }
+.ai-row.bot{ background:#fff; border:1px solid var(--line); align-self:flex-start; max-width:92%; }
+.ai-row.err{ background:#fff; border:1px solid var(--accent); color:var(--accent); align-self:flex-start; font-size:12px; }
+.ai-row .who{ font-size:11px; color:var(--sub); display:block; margin-bottom:2px; }
+.ai-input{ display:flex; gap:8px; margin-top:10px; align-items:flex-end; }
+.ai-input textarea{ flex:1; height:46px; border:1px solid var(--line); border-radius:8px; padding:8px; font-family:inherit; resize:none; }
+.link{ background:none; border:none; color:var(--accent); cursor:pointer; font-size:12px; font-family:inherit; text-decoration:underline; }
+.setting-row{ display:flex; flex-direction:column; gap:4px; margin:10px 0; }
+.setting-row label{ font-size:13px; color:var(--sub); }
+.setting-row input{ border:1px solid var(--line); border-radius:8px; padding:8px; font-family:inherit; font-size:13px; }
+.setting-hint{ font-size:12px; color:var(--sub); line-height:1.6; }
+
 </style>
 </head>
 <body>
@@ -1456,6 +1480,7 @@ body{
       <a data-route="files"><span class="num">03</span>文件库</a>
       <a data-route="notes"><span class="num">04</span>碎碎念</a>
       <a data-route="logs"><span class="num">05</span>工作日志</a>
+      <a id="aiSettingsBtn" style="cursor:pointer"><span class="num">⚙</span>AI 设置</a>
     </nav>
   </aside>
   <main id="main"></main>
@@ -1502,10 +1527,13 @@ function load(){
   save();
 }
 function normalize(){
+  if(!Array.isArray(state.tasks)) state.tasks = [];
   if(!Array.isArray(state.files)) state.files = [];
-  if(!state.fileFilters) state.fileFilters = {project:'all',type:'all',asc:true};
-  if(!state.filters) state.filters = {type:'all',dueBefore:'',status:'all',startFrom:''};
-  if(!state.projectOrder) state.projectOrder = [];
+  if(!Array.isArray(state.notes)) state.notes = [];
+  if(!Array.isArray(state.reports)) state.reports = [];
+  state.fileFilters = Object.assign({project:'all',type:'all',asc:true}, state.fileFilters||{});
+  state.filters = Object.assign({type:'all',dueBefore:'',status:'all',startFrom:''}, state.filters||{});
+  if(!Array.isArray(state.projectOrder)) state.projectOrder = [];
   if(!Array.isArray(state.expandedParents)) state.expandedParents=[];
   if(!state.ganttAnchor) state.ganttAnchor=todayStr();
   if(!Array.isArray(state.customTypes)) state.customTypes = [];
@@ -1531,7 +1559,10 @@ function normalize(){
     if(t.type) t.type=normalizeType(t.type);
   });
 }
-function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function save(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+  if(typeof clearAICtx === 'function') clearAICtx();
+}
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
 /* ============ 种子数据（按照片字段：招商局 / 特发集团） ============ */
@@ -2992,11 +3023,17 @@ function openFileEdit(id){
 /* ============ 碎碎念 ============ */
 function renderNotes(){
   let html = `${pageHeader('04','碎碎念','NOTES','灵光乍现 · 不进日报')}
-    <div class="card"><textarea id="ntext" placeholder="记一下此刻的想法…" style="width:100%;height:60px;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit"></textarea>
-    <div style="text-align:right;margin-top:8px"><button class="btn sm" id="nadd">添加</button></div></div>
-    <div class="card"><div class="section-h">时间线</div><ul class="tl">${state.notes.slice().reverse().map(n=>`<li><span class="muted">${esc(n.ts)}</span><br>${esc(n.text)}</li>`).join('')||'<li class="muted">还没有碎碎念</li>'}</ul></div>`;
+    <div class="notes-grid">
+      <div class="col-left">
+        <div class="card"><textarea id="ntext" placeholder="记一下此刻的想法…" style="width:100%;height:60px;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit"></textarea>
+        <div style="text-align:right;margin-top:8px"><button class="btn sm" id="nadd">添加</button></div></div>
+        <div class="card"><div class="section-h">时间线</div><ul class="tl">${state.notes.slice().reverse().map(n=>`<li><span class="muted">${esc(n.ts)}</span><br>${esc(n.text)}</li>`).join('')||'<li class="muted">还没有碎碎念</li>'}</ul></div>
+      </div>
+      ${renderAIPanel()}
+    </div>`;
   setMain(html);
   $('#nadd').addEventListener('click',()=>{ const v=$('#ntext').value.trim(); if(!v)return; state.notes.push({id:uid(),ts:nowISO(),text:v}); save(); renderNotes(); });
+  bindAIPanel();
 }
 
 /* ============ 工作日志 ============ */
@@ -3362,7 +3399,7 @@ function openTypeEditor(){
 }
 /* ============ 数据导入导出（4.7：换设备 / 清缓存不丢） ============ */
 function exportData(){
-  const data = JSON.stringify(state, null, 2);
+  const data = JSON.stringify({ state: state, ai: collectAIData() }, null, 2);
   const blob = new Blob([data], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3378,12 +3415,23 @@ function importData(file){
     let imported;
     try{ imported = JSON.parse(reader.result); }
     catch(e){ alert('文件不是有效的 JSON 备份'); return; }
-    if(!imported || !Array.isArray(imported.tasks)){ alert('备份文件格式不正确（缺少 tasks 字段）'); return; }
-    openImportChoice(imported);
+    const payload = normalizeBackupPayload(imported);
+    if(!payload){ alert('备份文件格式不正确（缺少 tasks 字段）'); return; }
+    openImportChoice(payload);
   };
   reader.readAsText(file);
 }
-function openImportChoice(imported){
+function normalizeBackupPayload(imported){
+  if(imported && imported.state && Array.isArray(imported.state.tasks)){
+    return { state: imported.state, ai: imported.ai || null };
+  }
+  if(imported && Array.isArray(imported.tasks)){
+    return { state: imported, ai: imported.ai || null };
+  }
+  return null;
+}
+function openImportChoice(payload){
+  const imported = payload.state;
   const cnt = k => Array.isArray(imported[k])?imported[k].length:0;
   const html = `<h3>导入备份</h3>
     <div class="hint">检测到备份含：<b>${cnt('tasks')}</b> 个任务、<b>${cnt('files')}</b> 个文件、<b>${cnt('logs')}</b> 条日志、<b>${cnt('notes')}</b> 条碎碎念。</div>
@@ -3396,12 +3444,14 @@ function openImportChoice(imported){
   openModal(html);
   $('#impCancel').addEventListener('click', closeModal);
   $('#impOverwrite').addEventListener('click', ()=>{
+    if(payload.ai){ restoreAIData(payload.ai); }
     state = imported; normalize(); save(); closeModal(); render();
-    alert('已覆盖导入：当前数据已被备份文件替换。');
+    alert('已覆盖导入：当前数据已被备份文件替换（AI 记忆已按备份恢复）。');
   });
   $('#impMerge').addEventListener('click', ()=>{
+    if(payload.ai){ restoreAIData(payload.ai, true); }
     mergeState(imported); save(); closeModal(); render();
-    alert('已合并导入：两份数据按 ID 拼合，重复 ID 以备份为准。');
+    alert('已合并导入：两份数据按 ID 拼合，重复 ID 以备份为准（AI 记忆按 ID 合并）。');
   });
 }
 /* 合并：各数组按 id 去重（同 id 以导入覆盖），projectOrder / customTypes 取并集 */
@@ -3454,7 +3504,228 @@ document.addEventListener('click',hideProjectMenu);
 document.addEventListener('scroll',hideProjectMenu,true);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideProjectMenu(); });
 
+
+/* ============ v7 碎碎念 AI 助手（BYOK + 透明 CORS 中继） ============ */
+/* 设计：AI 配置与对话历史走独立 localStorage 键，不进 state、不进备份的 Key 字段，
+   从而「版本升级 / 换设备导入」都不会覆盖 AI 记忆；对话记忆随备份迁移。 */
+const AI_LS_CFG = 'campus_workbench_ai';
+const AI_LS_CHAT = 'campus_workbench_ai_chat';
+const AI_LS_CTX = 'campus_workbench_ai_ctx';  // 工作台快照：按对话固化，保证 system 前缀稳定以命中 DeepSeek 缓存
+
+const AI_SYS_PROMPT = `你是「Work Buddy」的求职教练小助手，用户正在多项目并行备战校招/实习。
+你已读到工作台的结构化现状（任务/进度/截止/难点/碎碎念）。
+规则：
+1. 用中文、口语化、像靠谱的学长；每次回答不超过 200 字，给可执行的下一步。
+2. 主动点出卡点（停滞任务、临近截止、已知难点），但语气鼓励不制造焦虑。
+3. 可基于难点给面试/笔试/简历的具体建议；被问到具体岗位时可模拟面试。
+4. 不编造工作台没有的信息；不知道就说"工作台里没看到相关记录"。
+5. 用户隐私优先：不主动复述敏感字段，不把内容外传。`;
+
+function defaultAICfg(){ return { key:'', baseUrl:'', model:'deepseek-v4-pro', includeNotes:false }; }
+function loadAICfg(){
+  try{ const o = JSON.parse(localStorage.getItem(AI_LS_CFG)||'{}'); return Object.assign(defaultAICfg(), o); }
+  catch(e){ return defaultAICfg(); }
+}
+function saveAICfg(cfg){ localStorage.setItem(AI_LS_CFG, JSON.stringify(cfg)); }
+function loadChat(){
+  try{ const a = JSON.parse(localStorage.getItem(AI_LS_CHAT)||'[]'); return Array.isArray(a)?a:[]; }
+  catch(e){ return []; }
+}
+function loadAICtx(){ try{ return localStorage.getItem(AI_LS_CTX)||''; }catch(e){ return ''; } }
+function saveAICtx(s){ try{ if(s) localStorage.setItem(AI_LS_CTX, s); }catch(e){} }
+function clearAICtx(){ try{ localStorage.removeItem(AI_LS_CTX); }catch(e){} }
+function saveChat(arr){ localStorage.setItem(AI_LS_CHAT, JSON.stringify(arr.slice(-40))); }
+
+/* 收集 AI 数据用于导出（不含 Key，防泄露；记忆随备份迁移） */
+function collectAIData(){
+  const cfg = loadAICfg();
+  return { model: cfg.model, baseUrl: cfg.baseUrl, chat: loadChat() };
+}
+/* 从备份恢复 AI 数据；merge=true 时对话按内容去重合并 */
+function restoreAIData(ai, merge){
+  if(!ai) return;
+  clearAICtx();   // 导入的对话视为新会话，下次发送重新快照当前工作台
+  if(ai.model || ai.baseUrl){
+    const cfg = loadAICfg();
+    cfg.model = ai.model || cfg.model;
+    cfg.baseUrl = ai.baseUrl || cfg.baseUrl;
+    saveAICfg(cfg);   // 不恢复 Key（安全：需用户重新粘贴）
+  }
+  if(Array.isArray(ai.chat)){
+    let chat = loadChat();
+    if(merge){
+      const seen = new Set(chat.map(m=>m.role+m.content));
+      ai.chat.forEach(m=>{ const k=m.role+m.content; if(!seen.has(k)){ chat.push(m); seen.add(k); } });
+    } else { chat = ai.chat; }
+    saveChat(chat);
+  }
+}
+
+function daysSince(d){ if(!d) return 999; const t = new Date(d.replace(' ', 'T')); if(isNaN(t)) return 999; return Math.max(0, Math.round((Date.now()-t)/864e5)); }
+function daysUntil(d){ if(!d) return 999; const t = new Date(d.replace(' ', 'T')); if(isNaN(t)) return 999; return Math.round((t-Date.now())/864e5); }
+
+/* 把 state 蒸馏成上下文包（仅在用户发消息时生成并发送） */
+function buildContextPack(){
+  const stuck = state.tasks.filter(t=> t.status==='进行中' && (daysSince(t.updatedAt)>3 || t.progress<50));
+  const dueSoon = state.tasks.filter(t=> t.status!=='已交付' && daysUntil(t.due)<=3);
+  const blockers = state.tasks.filter(t=> (t.feedback&&t.feedback.trim()) || /卡|难|不会|没时间|焦虑/.test(t.feedback||''));
+  const todo = state.tasks.filter(t=> t.status==='未开始');
+  const cfg = loadAICfg();
+  const emo = cfg.includeNotes ? state.notes : state.notes.filter(n=> /累|焦虑|迷茫|不知道|好差|崩溃|放弃/.test(n.text));
+  const line = t => `· [${t.project}] ${t.name}｜进度${t.progress}%｜状态${t.status}` + (t.due?`｜截止${t.due}`:'') + (t.feedback?`｜难点：${t.feedback}`:'');
+  const total = state.tasks.length;
+  const done = state.tasks.filter(t=>t.status==='已交付').length;
+  const parts = [
+    '# 工作台现状（自动生成，仅本次对话使用）',
+    `## 整体进度：${done}/${total} 已交付`,
+    '## 停滞/低进度任务', stuck.map(line).join('\n')||'（无）',
+    '## 临近截止', dueSoon.map(line).join('\n')||'（无）',
+    '## 已知卡点/难点', blockers.map(line).join('\n')||'（无）',
+    '## 待办未开始', todo.map(line).join('\n')||'（无）',
+    '## 近期碎碎念情绪线索', emo.map(n=>`· ${n.ts}：${n.text}`).join('\n')||'（无）',
+    '## 最近操作', state.logs.slice(-8).map(l=>`· ${l.ts||''} ${l.text}`).join('\n')||'（无）'
+  ];
+  return parts.join('\n');
+}
+
+function renderAIPanel(){
+  const cfg = loadAICfg();
+  if(!cfg.key || !cfg.baseUrl){
+    return `<div class="card ai-card"><div class="section-h">🤖 AI 小助手</div>
+      <div class="ai-empty">尚未配置 AI。点右上角 <b>⚙ AI 设置</b> 粘贴你的 DeepSeek Key 与中继地址，助手就能读取你的全部工作台、主动提醒卡点。</div>
+      <div style="text-align:right;margin-top:8px"><button class="btn sm" id="aiSet">去设置</button></div></div>`;
+  }
+  return `<div class="card ai-card"><div class="section-h">🤖 AI 小助手 · 已读你 ${state.tasks.length} 项任务</div>
+    <div class="ai-quick">
+      <button class="chip" data-q="帮我梳理当前卡点">梳理卡点</button>
+      <button class="chip" data-q="给我今天的下一步建议">下一步建议</button>
+      <button class="chip" data-q="模拟招商局终面的高频题并给作答思路">模拟面试</button>
+    </div>
+    <div class="ai-msgs" id="aiMsgs">${renderChat()}</div>
+    <div class="ai-input"><textarea id="aiQ" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
+      <button class="btn sm" id="aiSend">发送</button></div>
+    <div style="text-align:right;margin-top:6px"><button class="link" id="aiSet2">设置</button> · <button class="link" id="aiClear">清空对话</button></div>
+  </div>`;
+}
+function renderChat(){
+  const chat = loadChat();
+  if(!chat.length) return '<div class="ai-row bot"><span class="who">助手</span>你好，我是你的求职教练。把卡点告诉我，或点上面的快捷提问试试。</div>';
+  return chat.map(m=>`<div class="ai-row ${m.role==='user'?'user':'bot'}"><span class="who">${m.role==='user'?'你':'助手'}</span>${esc(m.content)}</div>`).join('');
+}
+function bindAIPanel(){
+  const cfg = loadAICfg();
+  const setBtn = document.getElementById('aiSet'); if(setBtn) setBtn.addEventListener('click', openAISettings);
+  const setBtn2 = document.getElementById('aiSet2'); if(setBtn2) setBtn2.addEventListener('click', openAISettings);
+  const clearBtn = document.getElementById('aiClear'); if(clearBtn) clearBtn.addEventListener('click', ()=>{ if(confirm('确定清空与 AI 的对话记忆？')){ saveChat([]); clearAICtx(); renderNotes(); } });
+  if(!cfg.key || !cfg.baseUrl) return;
+  document.querySelectorAll('#main .ai-quick .chip').forEach(c=> c.addEventListener('click', ()=> sendAI(c.dataset.q)));
+  const send = document.getElementById('aiSend'); if(send) send.addEventListener('click', ()=>{ const v=document.getElementById('aiQ').value.trim(); if(v) sendAI(v); });
+  const q = document.getElementById('aiQ'); if(q) q.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); const v=q.value.trim(); if(v) sendAI(v); } });
+}
+function appendMsg(role, content){
+  const box = document.getElementById('aiMsgs'); if(!box) return;
+  const div = document.createElement('div');
+  div.className = 'ai-row ' + (role==='user'?'user':'bot');
+  div.innerHTML = `<span class="who">${role==='user'?'你':'助手'}</span>`;
+  div.appendChild(document.createTextNode(content));
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+  return div;
+}
+async function sendAI(text){
+  const box = document.getElementById('aiMsgs'); if(!box) return;
+  appendMsg('user', text);
+  const q = document.getElementById('aiQ'); if(q) q.value='';
+  const botDiv = appendMsg('bot', '…');
+  let shown = '';
+  const setBotText = txt => {
+    botDiv.innerHTML = '<span class="who">助手</span>';
+    botDiv.appendChild(document.createTextNode(txt));
+    box.scrollTop=box.scrollHeight;
+  };
+  const onToken = t => { shown += t; setBotText(shown); };
+  const onDone = () => { renderNotes(); };
+  const onErr = msg => { botDiv.className='ai-row err'; botDiv.textContent='⚠ '+msg; };
+  await callAI(text, onToken, onDone, onErr);
+}
+async function callAI(userMsg, onToken, onDone, onErr){
+  const cfg = loadAICfg();
+  if(!cfg.key || !cfg.baseUrl){ onErr('未配置 API Key 或中继地址（点 ⚙ AI 设置）'); if(onDone) onDone(); return; }
+  // 系统提示词保持恒定：上下文包仅在本段对话首条消息时快照一次并复用，
+  // 避免每轮 system 变化导致 DeepSeek 前缀缓存命中失败（多轮“未命中缓存”报错 / 中断）。
+  let ctx = loadAICtx();
+  if(!ctx){ ctx = buildContextPack(); saveAICtx(ctx); }
+  const sys = AI_SYS_PROMPT + '\n\n' + ctx;
+  const hist = loadChat();
+  const messages = [ ...hist, {role:'user', content:userMsg} ];
+  try{
+    const baseUrl = cfg.baseUrl.replace(/\/+$/,'').replace(/\/chat\/completions$/,'');
+    const r = await fetch(baseUrl + '/chat/completions', {
+      method:'POST',
+      headers:{ 'content-type':'application/json', 'authorization':'Bearer '+cfg.key },
+      body: JSON.stringify({ model: cfg.model||'deepseek-v4-pro', messages:[{role:'system',content:sys}, ...messages], stream:true })
+    });
+    if(!r.ok){
+      let detail = '';
+      try{ detail = (await r.text()).slice(0,180); }catch(e){}
+      onErr('API 返回 '+r.status+(detail?'：'+detail:'')+'（检查 Key / 中继地址 / 模型名）');
+      return;
+    }
+    if(!r.body || !r.body.getReader){ onErr('当前环境不支持流式读取（SSE）'); return; }
+    const reader = r.body.getReader(), dec = new TextDecoder();
+    let buf='', full='';
+    while(true){
+      const {done,value}=await reader.read(); if(done) break;
+      buf += dec.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data:')) continue;
+        const d = line.slice(5).trim(); if(d==='[DONE]') continue;
+        try{
+          const j=JSON.parse(d);
+          if(j.error){ onErr('API 错误：'+(j.error.message||JSON.stringify(j.error))); return; }
+          const t=j.choices?.[0]?.delta?.content||''; if(t){ full+=t; onToken(t); }
+        }catch(e){}
+      }
+    }
+    if(!full){ onErr('模型未返回内容（可能模型名错误或 Key 无权限）'); return; }
+    hist.push({role:'user',content:userMsg},{role:'assistant',content:full});
+    saveChat(hist);
+    if(onDone) onDone();
+  }catch(e){ onErr('网络 / CORS 错误：'+e.message+'（确认中继地址可访问）'); if(onDone) onDone(); }
+}
+function openAISettings(){
+  const cfg = loadAICfg();
+  const html = `<h3>🤖 AI 小助手设置</h3>
+    <div class="setting-hint">Key 只保存在你本浏览器（localStorage），不会写入源码或备份；调用时会经你信任的中继转发到模型服务，中继应只转发请求并加 CORS 头，不存 Key、不存对话。</div>
+    <div class="setting-row"><label>API Key（DeepSeek，以 sk- 开头）</label>
+      <input id="aiKey" type="password" placeholder="sk-..." value="${esc(cfg.key)}"></div>
+    <div class="setting-row"><label>中继地址（CORS 代理，以 https:// 开头，末尾不加 /chat/completions）</label>
+      <input id="aiBase" placeholder="https://你的worker.dev" value="${esc(cfg.baseUrl)}"></div>
+    <div class="setting-row"><label>模型</label>
+      <input id="aiModel" placeholder="deepseek-v4-pro" value="${esc(cfg.model)}"></div>
+    <div class="setting-row"><label><input type="checkbox" id="aiIncNotes" ${cfg.includeNotes?'checked':''}> 上下文包含碎碎念全文（默认仅情绪线索）</label></div>
+    <div class="setting-hint">中继一键部署：Cloudflare Workers 粘贴 <code>项目资产/ai-proxy.js</code> 内容，绑定路由即可（免费）。</div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn sm" id="aiSave">保存</button>
+      <button class="btn ghost sm" id="aiClear2">清空对话记忆</button>
+      <button class="btn ghost sm" id="aiCancel">取消</button>
+    </div>`;
+  openModal(html);
+  document.getElementById('aiCancel').addEventListener('click', closeModal);
+  document.getElementById('aiClear2').addEventListener('click', ()=>{ if(confirm('清空对话记忆？')){ saveChat([]); clearAICtx(); closeModal(); renderNotes(); } });
+  document.getElementById('aiSave').addEventListener('click', ()=>{
+    const ncfg = { key: document.getElementById('aiKey').value.trim(), baseUrl: document.getElementById('aiBase').value.trim().replace(/\/+$/,'').replace(/\/chat\/completions$/,''), model: document.getElementById('aiModel').value.trim()||'deepseek-v4-pro', includeNotes: document.getElementById('aiIncNotes').checked };
+    saveAICfg(ncfg);
+    clearAICtx();
+    closeModal();
+    if(!ncfg.key || !ncfg.baseUrl) alert('已保存（尚未配置完整，AI 区会显示引导）。');
+    else alert('AI 设置已保存。回到碎碎念页即可对话。');
+    renderNotes();
+  });
+}
+
 /* ============ 启动 ============ */
+$('#aiSettingsBtn').addEventListener('click', openAISettings);
 load();
 go('overview');
 </script>
